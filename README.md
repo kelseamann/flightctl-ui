@@ -1,6 +1,6 @@
 # rhem-current-state (Flight Control UI)
 
-Fork of [flightctl-ui](https://github.com/flightctl/flightctl-ui) for offline UI / RHEM UX work. Canonical repo: [gitlab.com/kmann4/rhem-current-state](https://gitlab.com/kmann4/rhem-current-state). **Contributors: fork this project** — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Fork of [flightctl-ui](https://github.com/flightctl/flightctl-ui) for offline UI / RHEM UX work. **Contributors: fork this project** — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Monorepo containing UIs for [Flight Control](https://github.com/flightctl/flightctl)
 
