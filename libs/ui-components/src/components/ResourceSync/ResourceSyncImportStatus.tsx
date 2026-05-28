@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Alert, AlertActionCloseButton, PageSection, Stack, StackItem } from '@patternfly/react-core';
 import { Trans } from 'react-i18next';
 
-import { ConditionType, ResourceSync, ResourceSyncList } from '@flightctl/types';
+import { ConditionType, ResourceSync, ResourceSyncList, ResourceSyncType } from '@flightctl/types';
 
 import { useTranslation } from '../../hooks/useTranslation';
 import { useFetchPeriodically } from '../../hooks/useFetchPeriodically';
@@ -65,6 +65,7 @@ const ResourceSyncInfoAlert = ({ rs, type }: { rs: ResourceSync; type: 'fleet' |
         )
       }
       isInline
+      data-testid={`resource-sync-import-pending-${name}`}
     />
   );
 };
@@ -114,6 +115,7 @@ const ResourceSyncErrorAlert = ({
       title={type === 'fleet' ? t('Fleets import failed') : t('Catalogs import failed')}
       isInline
       actionClose={<AlertActionCloseButton onClose={dismissAlert} />}
+      data-testid={`resource-sync-import-error-${name}`}
     >
       {type === 'fleet' ? (
         <Trans t={t}>
@@ -129,6 +131,14 @@ const ResourceSyncErrorAlert = ({
     </Alert>
   );
 };
+
+const filterResourceSyncsByPageType = (rsList: ResourceSync[], type: 'fleet' | 'catalog') =>
+  rsList.filter((rs) => {
+    const rsType = rs.spec?.type ?? ResourceSyncType.ResourceSyncTypeFleet;
+    return type === 'fleet'
+      ? rsType !== ResourceSyncType.ResourceSyncTypeCatalog
+      : rsType === ResourceSyncType.ResourceSyncTypeCatalog;
+  });
 
 const getVisibleResourceSyncs = (rsList: ResourceSync[]) => {
   const pendingRs: ResourceSync[] = [];
@@ -155,13 +165,16 @@ const ResourceSyncImport = ({ type }: { type: 'fleet' | 'catalog' }) => {
   });
 
   // TODO Remove the client-side filtering once the API filter is available
-  const { pendingRs, errorRs } = React.useMemo(() => getVisibleResourceSyncs(rsList?.items || []), [rsList]);
+  const { pendingRs, errorRs } = React.useMemo(
+    () => getVisibleResourceSyncs(filterResourceSyncsByPageType(rsList?.items || [], type)),
+    [rsList, type],
+  );
 
   if (pendingRs.length === 0 && errorRs.length === 0) {
     return null;
   }
   return (
-    <PageSection hasBodyWrapper={false}>
+    <PageSection hasBodyWrapper={false} data-testid={`resource-sync-import-status-${type}`}>
       <Stack hasGutter>
         {pendingRs.map((rs) => {
           return (

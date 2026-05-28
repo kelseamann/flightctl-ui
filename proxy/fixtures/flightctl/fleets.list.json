@@ -102,6 +102,53 @@
           "updateStatus": {}
         }
       }
+    },
+    {
+      "apiVersion": "v1beta1",
+      "kind": "Fleet",
+      "metadata": {
+        "creationTimestamp": "2024-04-10T11:05:00Z",
+        "generation": 1,
+        "labels": {},
+        "name": "pending-import-fleet",
+        "owner": "ResourceSync/rs-pending-fleet"
+      },
+      "spec": {
+        "selector": {
+          "matchLabels": {
+            "fleet": "pending-import-fleet"
+          }
+        },
+        "template": {
+          "metadata": {
+            "generation": 1
+          },
+          "spec": {
+            "config": [
+              {
+                "gitRef": {
+                  "path": "/demos/pending-fleet/",
+                  "repository": "git-init-repo",
+                  "targetRevision": "main"
+                },
+                "name": "pending-fleet-config"
+              }
+            ],
+            "os": {
+              "image": "quay.io/solar-farms/ai-inverter:1.5.0"
+            }
+          }
+        }
+      },
+      "status": {
+        "conditions": [],
+        "devicesSummary": {
+          "total": 0,
+          "applicationStatus": {},
+          "summaryStatus": {},
+          "updateStatus": {}
+        }
+      }
     }
   ]
 }

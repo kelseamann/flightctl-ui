@@ -58,20 +58,14 @@
         "path": "/demos/pending-fleet/"
       },
       "status": {
+        "observedCommit": "pending-commit-abc1234",
         "conditions": [
           {
             "lastTransitionTime": "2024-04-10T11:01:00Z",
-            "message": "Accessible",
+            "message": "Repository is accessible",
             "reason": "Accessible",
             "status": "True",
             "type": "Accessible"
-          },
-          {
-            "lastTransitionTime": "2024-04-10T11:02:00Z",
-            "message": "Parsed",
-            "reason": "Parsed",
-            "status": "True",
-            "type": "ResourceParsed"
           }
         ]
       }
@@ -91,17 +85,18 @@
         "path": "/demos/error-fleet/"
       },
       "status": {
+        "observedCommit": "error-commit-def5678",
         "conditions": [
           {
             "lastTransitionTime": "2024-04-10T12:01:00Z",
-            "message": "Accessible",
+            "message": "Repository is accessible",
             "reason": "Accessible",
             "status": "True",
             "type": "Accessible"
           },
           {
             "lastTransitionTime": "2024-04-10T12:02:00Z",
-            "message": "Failed to parse resources",
+            "message": "Failed to parse resources: invalid YAML in fleet template",
             "reason": "ParseFailed",
             "status": "False",
             "type": "ResourceParsed"

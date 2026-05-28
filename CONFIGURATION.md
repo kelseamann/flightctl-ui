@@ -29,7 +29,7 @@ This document describes all environment variables and configuration options avai
 | `IS_RHEM`                               | Red Hat Enterprise Mode                                                                             | _(empty)_                | `true`, `false`                              |
 | `DEV_MOCK_API`                          | Serve static JSON fixtures from the Go proxy instead of forwarding to `FLIGHTCTL_SERVER` (dev only) | `false`                  | `true`, `false`                              |
 | `DEV_MOCK_FIXTURES_DIR`                 | Directory containing mock JSON fixtures (default: `proxy/fixtures` when the proxy runs from `proxy/`) | _(empty)_             | absolute or relative path                      |
-| `DEV_MOCK_USER`                         | Username returned by `/api/login/info` in mock mode                                                  | `dev-user`               | any string                                   |
+| `DEV_MOCK_USER`                         | Username returned by `/api/login/info` in mock mode                                                  | `Kelsea Mann UXD`        | any string                                   |
 | `DEV_MOCK_ORG`                          | Organization name in mock fixtures (must match `organizations.list.json`)                            | `default`                | any string                                   |
 
 ## Offline UI development (mock API)
@@ -46,6 +46,7 @@ Limitations in mock mode:
 
 - Alerts, CLI artifacts, and device terminal return HTTP 501.
 - Image builder serves list/detail fixtures for `imagebuilds`, `imagepromotions`, and `imageexports`; other imagebuilder routes may return 404 or `{}` for mutations.
+- Software catalog serves `catalogs` and `catalogitems` list/detail fixtures under the flightctl API path (`v1alpha1` shapes in `proxy/fixtures/flightctl/`).
 - Only GET list/detail routes with fixtures are fully supported; other mutations return `{}`.
 - Extend fixtures under `proxy/fixtures/` using shapes from `@flightctl/types` (see `proxy/fixtures/README.md`).
 

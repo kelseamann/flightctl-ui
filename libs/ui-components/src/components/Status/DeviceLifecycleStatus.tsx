@@ -27,7 +27,7 @@ const DeviceLifecycleStatus = ({ device }: { device: Device }) => {
     );
   }
 
-  return <StatusDisplay item={item} message={device.status?.lifecycle.info} />;
+  return <StatusDisplay item={item} message={device.status?.lifecycle?.info} />;
 };
 
 export default DeviceLifecycleStatus;

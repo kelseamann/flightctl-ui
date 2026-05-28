@@ -3,6 +3,10 @@
     {
       "resource": "*",
       "operations": ["*"]
+    },
+    {
+      "resource": "resourcesyncs",
+      "operations": ["list", "get", "create", "delete", "patch", "update"]
     }
   ]
 }

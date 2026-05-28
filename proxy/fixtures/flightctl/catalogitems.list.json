@@ -1,0 +1,110 @@
+{
+  "apiVersion": "v1alpha1",
+  "kind": "CatalogItemList",
+  "metadata": {},
+  "items": [
+    {
+      "apiVersion": "v1alpha1",
+      "kind": "CatalogItem",
+      "metadata": {
+        "name": "nginx-demo",
+        "catalog": "demo-catalog",
+        "creationTimestamp": "2024-05-01T11:00:00Z",
+        "labels": {}
+      },
+      "spec": {
+        "category": "application",
+        "type": "container",
+        "displayName": "NGINX Demo",
+        "shortDescription": "Example container application from the software catalog",
+        "artifacts": [
+          {
+            "type": "container",
+            "name": "app",
+            "uri": "docker.io/library/nginx"
+          }
+        ],
+        "versions": [
+          {
+            "version": "1.0.0",
+            "references": {
+              "container": "1.25"
+            },
+            "channels": ["stable"]
+          },
+          {
+            "version": "1.1.0",
+            "references": {
+              "container": "1.26"
+            },
+            "channels": ["stable", "latest"]
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1alpha1",
+      "kind": "CatalogItem",
+      "metadata": {
+        "name": "edge-os-base",
+        "catalog": "demo-catalog",
+        "creationTimestamp": "2024-05-01T12:00:00Z",
+        "labels": {}
+      },
+      "spec": {
+        "category": "system",
+        "type": "os",
+        "displayName": "Edge OS Base",
+        "shortDescription": "Base operating system image for edge devices",
+        "artifacts": [
+          {
+            "type": "qcow2",
+            "name": "disk",
+            "uri": "quay.io/example/edge-os"
+          }
+        ],
+        "versions": [
+          {
+            "version": "4.16.0",
+            "references": {
+              "qcow2": "4.16.0"
+            },
+            "channels": ["stable"]
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1alpha1",
+      "kind": "CatalogItem",
+      "metadata": {
+        "name": "metrics-agent",
+        "catalog": "demo-catalog",
+        "creationTimestamp": "2024-05-02T09:00:00Z",
+        "labels": {}
+      },
+      "spec": {
+        "category": "application",
+        "type": "helm",
+        "displayName": "Metrics Agent",
+        "shortDescription": "Helm chart for cluster metrics collection",
+        "artifacts": [
+          {
+            "type": "container",
+            "name": "chart",
+            "uri": "oci://quay.io/example/charts/metrics-agent"
+          }
+        ],
+        "versions": [
+          {
+            "version": "0.5.0",
+            "references": {
+              "container": "0.5.0"
+            },
+            "channels": ["stable"]
+          }
+        ]
+      }
+    }
+  ]
+}

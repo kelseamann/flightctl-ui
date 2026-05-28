@@ -1,0 +1,35 @@
+{
+  "apiVersion": "v1beta1",
+  "kind": "ResourceSync",
+  "metadata": {
+    "creationTimestamp": "2024-04-10T12:00:00Z",
+    "generation": 1,
+    "name": "rs-error-fleet",
+    "labels": {}
+  },
+  "spec": {
+    "type": "fleet",
+    "repository": "git-init-repo",
+    "targetRevision": "main",
+    "path": "/demos/error-fleet/"
+  },
+  "status": {
+    "observedCommit": "error-commit-def5678",
+    "conditions": [
+      {
+        "lastTransitionTime": "2024-04-10T12:01:00Z",
+        "message": "Repository is accessible",
+        "reason": "Accessible",
+        "status": "True",
+        "type": "Accessible"
+      },
+      {
+        "lastTransitionTime": "2024-04-10T12:02:00Z",
+        "message": "Failed to parse resources: invalid YAML in fleet template",
+        "reason": "ParseFailed",
+        "status": "False",
+        "type": "ResourceParsed"
+      }
+    ]
+  }
+}

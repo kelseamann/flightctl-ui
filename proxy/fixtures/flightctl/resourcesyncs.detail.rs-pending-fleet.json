@@ -1,0 +1,28 @@
+{
+  "apiVersion": "v1beta1",
+  "kind": "ResourceSync",
+  "metadata": {
+    "creationTimestamp": "2024-04-10T11:00:00Z",
+    "generation": 2,
+    "name": "rs-pending-fleet",
+    "labels": {}
+  },
+  "spec": {
+    "type": "fleet",
+    "repository": "git-init-repo",
+    "targetRevision": "main",
+    "path": "/demos/pending-fleet/"
+  },
+  "status": {
+    "observedCommit": "pending-commit-abc1234",
+    "conditions": [
+      {
+        "lastTransitionTime": "2024-04-10T11:01:00Z",
+        "message": "Repository is accessible",
+        "reason": "Accessible",
+        "status": "True",
+        "type": "Accessible"
+      }
+    ]
+  }
+}

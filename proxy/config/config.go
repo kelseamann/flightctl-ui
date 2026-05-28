@@ -28,7 +28,7 @@ var (
 	TrustXForwardedHeaders = parseBoolEnv("TRUST_X_FORWARDED_HEADERS", false)
 	DevMockAPI             = parseBoolEnv("DEV_MOCK_API", false)
 	DevMockFixturesDir     = getEnvVar("DEV_MOCK_FIXTURES_DIR", "")
-	DevMockUser            = getEnvVar("DEV_MOCK_USER", "dev-user")
+	DevMockUser            = getEnvVar("DEV_MOCK_USER", "Kelsea Mann UXD")
 	DevMockOrg             = getEnvVar("DEV_MOCK_ORG", "default")
 )
 

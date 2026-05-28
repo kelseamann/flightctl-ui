@@ -12,7 +12,7 @@
     "start-prod": "npm run ts-node ../../node_modules/.bin/webpack serve --mode=production --color --progress",
     "dev": "concurrently \"npm run dev:proxy\" \"npm run dev:ui\"",
     "dev:kind": ". ./scripts/setup_env.sh && npm run dev",
-    "dev:proxy": "sh ../../hack/kill-dev-ports.sh 3001 && cd ../../proxy && nodemon --watch 'proxy/**/*' --exec 'go run' app.go --signal SIGKILL",
+    "dev:proxy": "sh ../../hack/kill-dev-ports.sh 3001 && cd ../../proxy && nodemon --watch 'mock' --watch 'fixtures' --watch 'middleware' --watch 'auth' --watch 'bridge' --watch 'config' --watch 'server' --watch 'app.go' --exec 'go run' app.go --signal SIGKILL",
     "dev:ui": "npm run ts-node ../../node_modules/.bin/webpack serve --mode=development --color --progress",
     "lint": "eslint ./src/ && prettier --check './src/**/*.{tsx,ts}' && npm run i18n",
     "format": "prettier --check --write './src/**/*.{tsx,ts}'",

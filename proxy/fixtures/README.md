@@ -7,7 +7,7 @@ JSON shapes should match `@flightctl/types` / the [flightctl OpenAPI spec](https
 ## Layout
 
 - `auth/` — auth config, permissions, userinfo
-- `flightctl/` — list responses (`*.list.json`) and optional `*.detail.<name>.json`
+- `flightctl/` — list responses (`*.list.json`) and optional `*.detail.<name>.json` or `*.detail.<parent>.<name>.json` for nested resources (e.g. `resourcesyncs.detail.rs-pending-fleet.json`)
 - `imagebuilder/` — image builds API (`v1alpha1`); list responses and optional detail files
 
 ## Adding a fixture

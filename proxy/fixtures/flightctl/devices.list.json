@@ -29,8 +29,17 @@
             "type": "Valid"
           }
         ],
+        "applicationsSummary": {
+          "status": "Healthy"
+        },
+        "lifecycle": {
+          "status": "Enrolled"
+        },
         "summary": {
-          "status": "Ready"
+          "status": "Online"
+        },
+        "updated": {
+          "status": "UpToDate"
         }
       }
     },
@@ -60,8 +69,17 @@
             "type": "Valid"
           }
         ],
+        "applicationsSummary": {
+          "status": "Healthy"
+        },
+        "lifecycle": {
+          "status": "Enrolled"
+        },
         "summary": {
-          "status": "Ready"
+          "status": "Online"
+        },
+        "updated": {
+          "status": "UpToDate"
         }
       }
     }

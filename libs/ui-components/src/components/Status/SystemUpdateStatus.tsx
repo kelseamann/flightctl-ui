@@ -10,9 +10,9 @@ const SystemUpdateStatus = ({ deviceStatus }: { deviceStatus?: DeviceStatus }) =
   const statusItems = getSystemUpdateStatusItems(t);
 
   const item = statusItems.find((statusItem) => {
-    return statusItem.id === deviceStatus?.updated.status;
+    return statusItem.id === deviceStatus?.updated?.status;
   });
-  return <StatusDisplay item={item} message={deviceStatus?.updated.info} />;
+  return <StatusDisplay item={item} message={deviceStatus?.updated?.info} />;
 };
 
 export default SystemUpdateStatus;

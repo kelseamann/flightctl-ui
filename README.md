@@ -8,7 +8,9 @@ Monorepo containing UIs for [Flight Control](https://github.com/flightctl/flight
 
 ## Contributing / offline development (no cluster)
 
-If you are working from a fork without access to a Flight Control API, use the **mock proxy** so the UI runs against static JSON fixtures:
+**Fork** [gitlab.com/kmann4/rhem-current-state](https://gitlab.com/kmann4/rhem-current-state) (do not push directly to that repo). See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full fork workflow, merge requests, and mock API details.
+
+If you do not have access to a Flight Control API, use the **mock proxy** so the UI runs against static JSON fixtures:
 
 ```shell
 npm ci
@@ -17,7 +19,7 @@ npm run dev:mock
 
 Open **http://localhost:9000** (the proxy on port 3001 runs in the background; there is no page to visit there).
 
-See **[CONTRIBUTING.md](CONTRIBUTING.md)** for setup, troubleshooting, extending fixtures, and when to switch to a real `FLIGHTCTL_SERVER`.
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for fork setup, troubleshooting, extending fixtures, and when to switch to a real `FLIGHTCTL_SERVER`.
 
 ## Building
 

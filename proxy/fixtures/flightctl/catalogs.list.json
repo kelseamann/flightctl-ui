@@ -1,0 +1,25 @@
+{
+  "apiVersion": "v1alpha1",
+  "kind": "CatalogList",
+  "metadata": {},
+  "items": [
+    {
+      "apiVersion": "v1alpha1",
+      "kind": "Catalog",
+      "metadata": {
+        "name": "demo-catalog",
+        "creationTimestamp": "2024-05-01T10:00:00Z",
+        "labels": {}
+      },
+      "spec": {
+        "displayName": "Demo Software Catalog",
+        "shortDescription": "Sample catalog for offline UI development",
+        "provider": "Flight Control",
+        "support": "https://github.com/flightctl/flightctl"
+      },
+      "status": {
+        "conditions": []
+      }
+    }
+  ]
+}

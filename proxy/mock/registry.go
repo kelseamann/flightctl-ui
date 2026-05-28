@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -24,14 +25,18 @@ func (s *Store) ResolveFixture(method, forwardPath string) ([]byte, int, error) 
 		return nil, http.StatusNotFound, fmt.Errorf("empty path")
 	}
 
+	fieldSelector := ""
 	pathOnly := forwardPath
 	if idx := strings.Index(pathOnly, "?"); idx >= 0 {
+		if values, err := url.ParseQuery(pathOnly[idx+1:]); err == nil {
+			fieldSelector = values.Get("fieldSelector")
+		}
 		pathOnly = pathOnly[:idx]
 	}
 
 	switch method {
 	case http.MethodGet:
-		return s.resolveGet(pathOnly)
+		return s.resolveGet(pathOnly, fieldSelector)
 	case http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
 		return s.resolveMutation(method, pathOnly)
 	default:
@@ -39,7 +44,7 @@ func (s *Store) ResolveFixture(method, forwardPath string) ([]byte, int, error) 
 	}
 }
 
-func (s *Store) resolveGet(pathOnly string) ([]byte, int, error) {
+func (s *Store) resolveGet(pathOnly string, fieldSelector string) ([]byte, int, error) {
 	switch pathOnly {
 	case "api/v1/organizations":
 		return s.mustRead("flightctl/organizations.list.json")
@@ -54,11 +59,27 @@ func (s *Store) resolveGet(pathOnly string) ([]byte, int, error) {
 	case "api/v1/repositories":
 		return s.mustRead("flightctl/repositories.list.json")
 	case "api/v1/resourcesyncs":
-		return s.mustRead("flightctl/resourcesyncs.list.json")
+		data, status, err := s.mustRead("flightctl/resourcesyncs.list.json")
+		if err != nil {
+			return nil, status, err
+		}
+		filtered, filterErr := filterResourceSyncList(data, fieldSelector)
+		if filterErr != nil {
+			return nil, http.StatusInternalServerError, filterErr
+		}
+		return filtered, status, nil
 	case "api/v1/devices":
 		return s.mustRead("flightctl/devices.list.json")
 	case "api/v1/enrollmentrequests":
 		return s.mustRead("flightctl/enrollmentrequests.list.json")
+	case "api/v1/catalogs":
+		return s.mustRead("flightctl/catalogs.list.json")
+	case "api/v1/catalogitems":
+		return s.mustRead("flightctl/catalogitems.list.json")
+	}
+
+	if catalogName, itemName, ok := parseCatalogItemPath(pathOnly); ok {
+		return s.resolveCatalogItemDetail(catalogName, itemName)
 	}
 
 	if detail, ok := parseDetailPath(pathOnly); ok {

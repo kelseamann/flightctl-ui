@@ -6,6 +6,54 @@ For environment variable reference, see [CONFIGURATION.md](CONFIGURATION.md). Fo
 
 ---
 
+## How to contribute (fork workflow)
+
+**Do not push directly to the canonical repository.** Contributors should use a **fork** and open a merge request.
+
+| Repository | Role |
+|----------|------|
+| [gitlab.com/kmann4/rhem-current-state](https://gitlab.com/kmann4/rhem-current-state) | Canonical fork for offline UI / RHEM UX work (this tree) |
+| [github.com/flightctl/flightctl-ui](https://github.com/flightctl/flightctl-ui) | Upstream Flight Control UI |
+
+### First-time setup
+
+1. **Fork** [kmann4/rhem-current-state](https://gitlab.com/kmann4/rhem-current-state) on GitLab (or fork upstream on GitHub if you are contributing there instead).
+2. Clone **your fork**, not the canonical repo:
+
+```shell
+git clone git@gitlab.com:<your-username>/rhem-current-state.git
+cd rhem-current-state
+```
+
+3. Add remotes (adjust names if you already use `origin` for your fork):
+
+```shell
+git remote add upstream https://gitlab.com/kmann4/rhem-current-state.git
+# Optional: track upstream Flight Control UI
+git remote add flightctl-ui https://github.com/flightctl/flightctl-ui.git
+```
+
+4. Install dependencies and run the mock dev stack (see below).
+
+### Submitting changes
+
+```shell
+git checkout -b my-feature
+# edit, test with npm run dev:mock and npm run lint
+git push -u origin my-feature
+```
+
+Open a **merge request** on GitLab from your fork into `kmann4/rhem-current-state` (or into `flightctl/flightctl-ui` if that is your target upstream).
+
+Keep your fork updated:
+
+```shell
+git fetch upstream
+git merge upstream/main   # or rebase, per team preference
+```
+
+---
+
 ## Prerequisites
 
 Install before developing:
@@ -25,11 +73,12 @@ Optional, depending on workflow:
 
 ---
 
-## First-time setup
+## Toolchain install
+
+After cloning your fork:
 
 ```shell
-git clone <your-fork-url>
-cd flightctl-ui
+cd rhem-current-state   # or your clone directory name
 npm ci
 ```
 
@@ -79,7 +128,7 @@ Open **http://localhost:9000** in a browser.
 
 Expected behavior:
 
-- Logged in as **`dev-user`** (configurable via `DEV_MOCK_USER`)
+- Logged in as **`Kelsea Mann UXD`** (configurable via `DEV_MOCK_USER`)
 - Organization **`default`** auto-selected (see `proxy/fixtures/flightctl/organizations.list.json`)
 - **Fleets**, **Repositories**, and related list pages show fixture data
 - Fleets page may show **ResourceSync** import alerts if fixtures include pending/error syncs
@@ -98,7 +147,7 @@ Proxy running at:3001
 Browser (localhost:9000)
   → fetch http://localhost:3001/api/flightctl/api/v1/...
   → Go proxy (DEV_MOCK_API)
-       ├─ /api/login/*     → mock auth (session cookie, dev-user)
+       ├─ /api/login/*     → mock auth (session cookie, Kelsea Mann UXD)
        └─ /api/flightctl/* → JSON fixtures under proxy/fixtures/
   → React parses JSON as @flightctl/types models
 ```
@@ -111,7 +160,7 @@ The UI never talks to the real API host in mock mode. Shapes must still match ty
 |----------|---------|---------|
 | `DEV_MOCK_API` | `false` | Set to `true` by `npm run dev:mock` |
 | `DEV_MOCK_FIXTURES_DIR` | _(empty → `proxy/fixtures` when cwd is `proxy/`)_ | Override fixture root |
-| `DEV_MOCK_USER` | `dev-user` | Username in `/api/login/info` |
+| `DEV_MOCK_USER` | `Kelsea Mann UXD` | Username in `/api/login/info` |
 | `DEV_MOCK_ORG` | `default` | Documented org id; must match fixture `metadata.name` |
 | `API_PORT` | `3001` | Proxy listen port |
 | `ENABLE_CLI_ARTIFACTS` | set `false` by `dev:mock` script | Avoids optional CLI proxy routes |
@@ -148,7 +197,7 @@ kill <pid>
 #### Redirect to `/login` or blank app after load
 
 - Confirm the proxy is running (check terminal for `Proxy running at:3001`).
-- In DevTools → **Network**, `GET http://localhost:3001/api/login/info` should return **200** with `{"username":"dev-user"}`.
+- In DevTools → **Network**, `GET http://localhost:3001/api/login/info` should return **200** with `{"username":"Kelsea Mann UXD"}`.
 - Clear site data for `localhost:9000` / `localhost:3001` if an old session cookie conflicts.
 
 #### `428 Organization selection required`
@@ -158,6 +207,10 @@ The UI sends `X-FlightCtl-Organization-ID` after org selection. Ensure `organiza
 #### Page loads but lists are empty / errors
 
 The route may have **no fixture** yet. See [Adding fixtures](#adding-or-updating-fixtures) and check the browser Network tab for `404` responses with `"mock: no fixture for GET ..."`.
+
+#### Devices page: “Unexpected error occurred” on the enrolled devices table
+
+Enrollment requests can load while the main **Devices** table crashes during render. Mock `devices.list.json` entries must include at least `status.lifecycle`, `status.applicationsSummary`, `status.updated`, and `status.summary` (use enum values from `@flightctl/types`, e.g. `Enrolled`, `Healthy`, `UpToDate`, `Online`). See `proxy/fixtures/flightctl/devices.list.json`.
 
 #### `npm run dev:mock` vs Cypress
 
@@ -180,13 +233,17 @@ Cypress `cy.intercept` stubs run **only inside Cypress**. Mock proxy mode works 
 | `api/v1/resourcesyncs` | `flightctl/resourcesyncs.list.json` |
 | `api/v1/devices` | `flightctl/devices.list.json` |
 | `api/v1/enrollmentrequests` | `flightctl/enrollmentrequests.list.json` |
+| `api/v1/catalogs` | `flightctl/catalogs.list.json` |
+| `api/v1/catalogitems` | `flightctl/catalogitems.list.json` |
+| `api/v1/catalogs/<name>` | Item from `catalogs.list.json` or `flightctl/catalogs.detail.<name>.json` |
+| `api/v1/catalogs/<catalog>/items/<item>` | Item from `catalogitems.list.json` (matched by `metadata.catalog` + `metadata.name`) |
 | `api/v1/<resource>/<name>` | Item from matching `*.list.json`, or `flightctl/<resource>.detail.<name>.json` |
 | `api/v1/imagebuilds` | `imagebuilder/imagebuilds.list.json` |
 | `api/v1/imagepromotions` | `imagebuilder/imagepromotions.list.json` |
 | `api/v1/imageexports` | `imagebuilder/imageexports.list.json` |
 | `api/v1/imagebuilds/<name>` | Item from `imagebuilds.list.json` or `imagebuilder/imagebuilds.detail.<name>.json` |
 
-Routing logic: `proxy/mock/registry.go` (flightctl) and `proxy/mock/registry_imagebuilder.go` (imagebuilder).
+Routing logic: `proxy/mock/registry.go` and `proxy/mock/registry_catalog.go` (flightctl + software catalog), `proxy/mock/registry_imagebuilder.go` (imagebuilder).
 
 ### Not supported in mock mode (HTTP 501)
 
@@ -248,7 +305,9 @@ See [proxy/fixtures/README.md](proxy/fixtures/README.md).
 
 ### 4. Restart the proxy
 
-`nodemon` reloads when files under `proxy/` change (including `fixtures/**/*.json`). If the UI still looks stale, restart `npm run dev:mock`.
+**Fixture JSON** is read from disk on each request—refresh the browser after editing `proxy/fixtures/`.
+
+**Go code** under `proxy/` is restarted by `nodemon` when `mock/`, `fixtures/`, or `app.go` change. If the UI still looks stale, restart `npm run dev:mock`.
 
 ### 5. Verify
 
@@ -269,7 +328,15 @@ cd proxy && go test ./mock/...
 
 ### ResourceSync alert fixtures
 
-`ResourceSyncImportStatus` shows alerts when `status.conditions` imply pending or error states (see `libs/ui-components/src/utils/status/repository.ts`). Include varied conditions in `resourcesyncs.list.json` when testing fleet import banners.
+`ResourceSyncImportStatus` shows alerts when `status.conditions` imply pending or error states (see `libs/ui-components/src/utils/status/repository.ts`). Fleet import banners use fixtures in `resourcesyncs.list.json`:
+
+- `rs-pending-fleet` — accessible but not synced (info alert on Fleets)
+- `rs-error-fleet` — parse failed (error alert on Fleets)
+- `rs-synced-fleet` — fully synced (no banner)
+
+Detail routes: `resourcesyncs.detail.rs-pending-fleet.json` and `resourcesyncs.detail.rs-error-fleet.json` (also used when opening `/devicemanagement/resourcesyncs/:rsId`).
+
+If alerts were dismissed earlier, clear `localStorage` key `FC_DISMISS_SYNCS`.
 
 ---
 
@@ -334,6 +401,7 @@ cd proxy && go test ./...
 
 ## Getting help
 
-- Upstream project: [flightctl/flightctl-ui](https://github.com/flightctl/flightctl-ui)
+- Canonical fork (offline UI): [gitlab.com/kmann4/rhem-current-state](https://gitlab.com/kmann4/rhem-current-state)
+- Upstream UI: [flightctl/flightctl-ui](https://github.com/flightctl/flightctl-ui)
 - Backend API: [flightctl/flightctl](https://github.com/flightctl/flightctl)
 - Configuration reference: [CONFIGURATION.md](CONFIGURATION.md)
