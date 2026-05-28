@@ -393,6 +393,22 @@ cd proxy && go test ./...
 
 ---
 
+## GitLab Pages (static UI preview)
+
+Pushes to **`main`** on [gitlab.com/kmann4/rhem-current-state](https://gitlab.com/kmann4/rhem-current-state) run `.gitlab-ci.yml` and publish the standalone UI to GitLab Pages.
+
+| Item | Value |
+|------|--------|
+| **URL** | `https://<namespace>.gitlab.io/rhem-current-state/` (e.g. `https://kmann4.gitlab.io/rhem-current-state/`) |
+| **Pipeline** | `build:ui` → `pages` (artifact `public/`) |
+| **Local dry-run** | `npm run build:pages` then serve `public/` with any static server |
+
+**Limitation:** Pages hosts **static files only**. The Go mock proxy does **not** run on Pages, so API calls (login, fleets, devices, etc.) will fail unless you point a real `FLIGHTCTL_SERVER` at the build (not configured in the default pipeline). Use **`npm run dev:mock`** locally for a fully interactive offline demo.
+
+To restrict who can view the site on a private project, enable **Pages access control** under **Settings → General → Pages** (requires instance support). See [GitLab Pages access control](https://docs.gitlab.com/user/project/pages/pages_access_control/).
+
+---
+
 ## Security note
 
 **Never enable `DEV_MOCK_API` in production.** It bypasses real authentication and serves static data. It is intended for local development only.
