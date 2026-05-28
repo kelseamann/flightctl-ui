@@ -21,7 +21,6 @@
     "dev:ocp": "npm run -w @flightctl/ocp-plugin dev",
     "dev:kind": "npm run -w @flightctl/standalone dev:kind",
     "build": "npm run -w @flightctl/standalone build",
-    "build:pages": "npm run build:libs && ASSET_PATH=${ASSET_PATH:-/rhem-current-state/} IS_RHEM=true npm run build && sh hack/gitlab-pages-prepare.sh",
     "build:ocp": "npm run -w @flightctl/ocp-plugin build",
     "build:libs": "npm run -w @flightctl/types build && npm run -w @flightctl/ui-components build",
     "gen-types": "npm run -w @flightctl/types gen-types",

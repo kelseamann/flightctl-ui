@@ -23,10 +23,6 @@ Open **http://localhost:9000** (the proxy on port 3001 runs in the background; t
 
 See **[CONTRIBUTING.md](CONTRIBUTING.md)** for fork setup, troubleshooting, extending fixtures, and when to switch to a real `FLIGHTCTL_SERVER`.
 
-### GitLab Pages preview
-
-Merges to `main` deploy a **static** build to GitLab Pages (see `.gitlab-ci.yml`). The live URL is shown under **Deploy → Pages** in the GitLab project. That preview does not include the mock API—use `npm run dev:mock` for full offline behavior.
-
 ## Building
 
 ### JavaScript/TypeScript Applications
