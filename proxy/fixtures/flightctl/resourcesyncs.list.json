@@ -1,0 +1,113 @@
+{
+  "apiVersion": "v1beta1",
+  "kind": "ResourceSyncList",
+  "metadata": {},
+  "items": [
+    {
+      "apiVersion": "v1beta1",
+      "kind": "ResourceSync",
+      "metadata": {
+        "creationTimestamp": "2024-04-10T10:00:00Z",
+        "generation": 1,
+        "name": "rs-synced-fleet"
+      },
+      "spec": {
+        "type": "fleet",
+        "repository": "git-init-repo",
+        "targetRevision": "main",
+        "path": "/demos/basic-nginx-fleet/configuration/"
+      },
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-04-10T10:05:00Z",
+            "message": "Accessible",
+            "reason": "Accessible",
+            "status": "True",
+            "type": "Accessible"
+          },
+          {
+            "lastTransitionTime": "2024-04-10T10:06:00Z",
+            "message": "Parsed",
+            "reason": "Parsed",
+            "status": "True",
+            "type": "ResourceParsed"
+          },
+          {
+            "lastTransitionTime": "2024-04-10T10:07:00Z",
+            "message": "Synced",
+            "reason": "Synced",
+            "status": "True",
+            "type": "Synced"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1beta1",
+      "kind": "ResourceSync",
+      "metadata": {
+        "creationTimestamp": "2024-04-10T11:00:00Z",
+        "generation": 2,
+        "name": "rs-pending-fleet"
+      },
+      "spec": {
+        "type": "fleet",
+        "repository": "git-init-repo",
+        "targetRevision": "main",
+        "path": "/demos/pending-fleet/"
+      },
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-04-10T11:01:00Z",
+            "message": "Accessible",
+            "reason": "Accessible",
+            "status": "True",
+            "type": "Accessible"
+          },
+          {
+            "lastTransitionTime": "2024-04-10T11:02:00Z",
+            "message": "Parsed",
+            "reason": "Parsed",
+            "status": "True",
+            "type": "ResourceParsed"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1beta1",
+      "kind": "ResourceSync",
+      "metadata": {
+        "creationTimestamp": "2024-04-10T12:00:00Z",
+        "generation": 1,
+        "name": "rs-error-fleet"
+      },
+      "spec": {
+        "type": "fleet",
+        "repository": "git-init-repo",
+        "targetRevision": "main",
+        "path": "/demos/error-fleet/"
+      },
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-04-10T12:01:00Z",
+            "message": "Accessible",
+            "reason": "Accessible",
+            "status": "True",
+            "type": "Accessible"
+          },
+          {
+            "lastTransitionTime": "2024-04-10T12:02:00Z",
+            "message": "Failed to parse resources",
+            "reason": "ParseFailed",
+            "status": "False",
+            "type": "ResourceParsed"
+          }
+        ]
+      }
+    }
+  ]
+}

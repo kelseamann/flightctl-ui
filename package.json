@@ -16,6 +16,8 @@
   "scripts": {
     "prebuild": "rimraf **/dist",
     "dev": "npm run -w @flightctl/standalone dev",
+    "predev:mock": "sh hack/kill-dev-ports.sh",
+    "dev:mock": "DEV_MOCK_API=true ENABLE_CLI_ARTIFACTS=false npm run dev",
     "dev:ocp": "npm run -w @flightctl/ocp-plugin dev",
     "dev:kind": "npm run -w @flightctl/standalone dev:kind",
     "build": "npm run -w @flightctl/standalone build",

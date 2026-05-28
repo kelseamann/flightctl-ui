@@ -14,6 +14,7 @@ import (
 	"github.com/flightctl/flightctl-ui/config"
 	"github.com/flightctl/flightctl-ui/log"
 	"github.com/flightctl/flightctl-ui/middleware"
+	"github.com/flightctl/flightctl-ui/mock"
 	"github.com/flightctl/flightctl-ui/server"
 )
 
@@ -40,44 +41,67 @@ func main() {
 		os.Exit(1)
 	}
 
-	apiRouter.Handle("/imagebuilder/{forward:.*}", bridge.NewImageBuilderHandler(tlsConfig))
+	if config.DevMockAPI {
+		log.Warn("DEV_MOCK_API enabled — not forwarding Flight Control API traffic to FLIGHTCTL_SERVER")
 
-	apiRouter.Handle("/flightctl/{forward:.*}", bridge.NewFlightCtlHandler(tlsConfig))
+		fixtureStore, err := mock.NewStore()
+		if err != nil {
+			log.WithError(err).Error("Failed to load dev mock fixtures")
+			os.Exit(1)
+		}
 
-	alertManagerUrl, alertManagerEnabled := os.LookupEnv("FLIGHTCTL_ALERTMANAGER_PROXY")
-	if alertManagerEnabled && alertManagerUrl != "" {
-		apiRouter.Handle("/alerts/{forward:.*}", bridge.NewAlertManagerHandler(tlsConfig))
-	} else {
+		mockAuth := mock.NewAuthHandler()
+		apiRouter.Handle("/flightctl/{forward:.*}", mock.NewFlightCtlHandler(fixtureStore))
+		apiRouter.Handle("/imagebuilder/{forward:.*}", mock.NewImageBuilderHandler(fixtureStore))
 		apiRouter.HandleFunc("/alerts/{forward:.*}", bridge.UnimplementedHandler)
-	}
-
-	cliArtifactsUrl, cliArtifactsEnabled := os.LookupEnv("FLIGHTCTL_CLI_ARTIFACTS_SERVER")
-	if cliArtifactsEnabled && cliArtifactsUrl != "" {
-		apiRouter.Handle("/cli-artifacts", bridge.NewFlightCtlCliArtifactsHandler(tlsConfig))
-	} else {
 		apiRouter.HandleFunc("/cli-artifacts", bridge.UnimplementedHandler)
-	}
+		apiRouter.HandleFunc("/terminal/{forward:.*}", bridge.UnimplementedHandler)
+		apiRouter.HandleFunc("/test-auth-provider-connection", bridge.UnimplementedHandler)
 
-	terminalBridge := bridge.TerminalBridge{TlsConfig: tlsConfig}
-	apiRouter.HandleFunc("/terminal/{forward:.*}", terminalBridge.HandleTerminal)
+		if config.OcpPlugin != "true" {
+			apiRouter.HandleFunc("/login-command", mockAuth.GetLoginCommand)
+			apiRouter.HandleFunc("/login", mockAuth.Login)
+			apiRouter.HandleFunc("/login/info", mockAuth.GetUserInfo)
+			apiRouter.HandleFunc("/login/refresh", mockAuth.Refresh)
+			apiRouter.HandleFunc("/logout", mockAuth.Logout)
+		}
+	} else {
+		apiRouter.Handle("/imagebuilder/{forward:.*}", bridge.NewImageBuilderHandler(tlsConfig))
+		apiRouter.Handle("/flightctl/{forward:.*}", bridge.NewFlightCtlHandler(tlsConfig))
 
-	testAuthHandler := bridge.NewTestAuthHandler(tlsConfig)
-	apiRouter.HandleFunc("/test-auth-provider-connection", testAuthHandler.TestConnection)
+		alertManagerUrl, alertManagerEnabled := os.LookupEnv("FLIGHTCTL_ALERTMANAGER_PROXY")
+		if alertManagerEnabled && alertManagerUrl != "" {
+			apiRouter.Handle("/alerts/{forward:.*}", bridge.NewAlertManagerHandler(tlsConfig))
+		} else {
+			apiRouter.HandleFunc("/alerts/{forward:.*}", bridge.UnimplementedHandler)
+		}
 
-	authHandler, err := auth.NewAuth(tlsConfig)
-	if err != nil {
-		log.WithError(err).Error("Failed to initialize authentication")
-		os.Exit(1)
-	}
-	// Viewing the login command is always available
-	apiRouter.HandleFunc("/login-command", authHandler.GetLoginCommand)
+		cliArtifactsUrl, cliArtifactsEnabled := os.LookupEnv("FLIGHTCTL_CLI_ARTIFACTS_SERVER")
+		if cliArtifactsEnabled && cliArtifactsUrl != "" {
+			apiRouter.Handle("/cli-artifacts", bridge.NewFlightCtlCliArtifactsHandler(tlsConfig))
+		} else {
+			apiRouter.HandleFunc("/cli-artifacts", bridge.UnimplementedHandler)
+		}
 
-	// Login/logout actions are only available in the standalone UI
-	if config.OcpPlugin != "true" {
-		apiRouter.HandleFunc("/login", authHandler.Login)
-		apiRouter.HandleFunc("/login/info", authHandler.GetUserInfo)
-		apiRouter.HandleFunc("/login/refresh", authHandler.Refresh)
-		apiRouter.HandleFunc("/logout", authHandler.Logout)
+		terminalBridge := bridge.TerminalBridge{TlsConfig: tlsConfig}
+		apiRouter.HandleFunc("/terminal/{forward:.*}", terminalBridge.HandleTerminal)
+
+		testAuthHandler := bridge.NewTestAuthHandler(tlsConfig)
+		apiRouter.HandleFunc("/test-auth-provider-connection", testAuthHandler.TestConnection)
+
+		authHandler, err := auth.NewAuth(tlsConfig)
+		if err != nil {
+			log.WithError(err).Error("Failed to initialize authentication")
+			os.Exit(1)
+		}
+		apiRouter.HandleFunc("/login-command", authHandler.GetLoginCommand)
+
+		if config.OcpPlugin != "true" {
+			apiRouter.HandleFunc("/login", authHandler.Login)
+			apiRouter.HandleFunc("/login/info", authHandler.GetUserInfo)
+			apiRouter.HandleFunc("/login/refresh", authHandler.Refresh)
+			apiRouter.HandleFunc("/logout", authHandler.Logout)
+		}
 	}
 
 	spa := server.SpaHandler{}
@@ -100,7 +124,7 @@ func main() {
 	srv := &http.Server{
 		Handler:      corsHandler(router),
 		Addr:         config.BridgePort,
-		WriteTimeout: 15 * time.Minute, // Long timeout for streaming responses (SSE, chunked encoding)
+		WriteTimeout: 15 * time.Minute,
 		ReadTimeout:  15 * time.Second,
 	}
 

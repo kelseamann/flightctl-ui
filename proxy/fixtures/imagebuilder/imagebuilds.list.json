@@ -1,0 +1,81 @@
+{
+  "apiVersion": "v1alpha1",
+  "kind": "ImageBuildList",
+  "metadata": {},
+  "items": [
+    {
+      "apiVersion": "v1alpha1",
+      "kind": "ImageBuild",
+      "metadata": {
+        "name": "demo-build-1",
+        "creationTimestamp": "2024-04-10T12:00:00Z",
+        "labels": {}
+      },
+      "spec": {
+        "source": {
+          "repository": "oci-registry",
+          "imageName": "example/base",
+          "imageTag": "1.0"
+        },
+        "destination": {
+          "repository": "oci-registry",
+          "imageName": "example/output",
+          "imageTag": "1.0"
+        },
+        "binding": {
+          "type": "early"
+        }
+      },
+      "status": {
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True",
+            "lastTransitionTime": "2024-04-10T12:30:00Z",
+            "message": "Build completed successfully",
+            "reason": "BuildSucceeded"
+          }
+        ],
+        "imageReference": "quay.io/example/output:1.0",
+        "architecture": "amd64"
+      },
+      "imageexports": []
+    },
+    {
+      "apiVersion": "v1alpha1",
+      "kind": "ImageBuild",
+      "metadata": {
+        "name": "demo-build-2",
+        "creationTimestamp": "2024-04-11T09:00:00Z",
+        "labels": {}
+      },
+      "spec": {
+        "source": {
+          "repository": "oci-registry",
+          "imageName": "example/base",
+          "imageTag": "2.0"
+        },
+        "destination": {
+          "repository": "oci-registry",
+          "imageName": "example/output",
+          "imageTag": "2.0"
+        },
+        "binding": {
+          "type": "early"
+        }
+      },
+      "status": {
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "False",
+            "lastTransitionTime": "2024-04-11T09:15:00Z",
+            "message": "Build in progress",
+            "reason": "BuildRunning"
+          }
+        ]
+      },
+      "imageexports": []
+    }
+  ]
+}

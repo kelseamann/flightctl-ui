@@ -1,0 +1,69 @@
+{
+  "apiVersion": "v1beta1",
+  "kind": "DeviceList",
+  "metadata": {},
+  "items": [
+    {
+      "apiVersion": "v1beta1",
+      "kind": "Device",
+      "metadata": {
+        "creationTimestamp": "2024-04-10T14:00:00Z",
+        "labels": {
+          "fleet": "eu-east-prod-001",
+          "alias": "east-device-1"
+        },
+        "name": "device-east-001"
+      },
+      "spec": {
+        "os": {
+          "image": "quay.io/solar-farms/ai-inverter:1.5.0"
+        }
+      },
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-04-10T14:05:00Z",
+            "message": "Valid",
+            "reason": "Valid",
+            "status": "True",
+            "type": "Valid"
+          }
+        ],
+        "summary": {
+          "status": "Ready"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1beta1",
+      "kind": "Device",
+      "metadata": {
+        "creationTimestamp": "2024-04-10T15:00:00Z",
+        "labels": {
+          "fleet": "eu-west-prod-001",
+          "alias": "west-device-1"
+        },
+        "name": "device-west-001"
+      },
+      "spec": {
+        "os": {
+          "image": "quay.io/solar-farms/ai-inverter:1.5.0"
+        }
+      },
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-04-10T15:05:00Z",
+            "message": "Valid",
+            "reason": "Valid",
+            "status": "True",
+            "type": "Valid"
+          }
+        ],
+        "summary": {
+          "status": "Ready"
+        }
+      }
+    }
+  ]
+}

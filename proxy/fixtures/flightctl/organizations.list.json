@@ -1,0 +1,17 @@
+{
+  "apiVersion": "v1beta1",
+  "kind": "OrganizationList",
+  "metadata": {},
+  "items": [
+    {
+      "apiVersion": "v1beta1",
+      "kind": "Organization",
+      "metadata": {
+        "name": "default"
+      },
+      "spec": {
+        "displayName": "Default Organization"
+      }
+    }
+  ]
+}

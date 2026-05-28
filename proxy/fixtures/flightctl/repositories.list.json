@@ -1,0 +1,55 @@
+{
+  "apiVersion": "v1beta1",
+  "kind": "RepositoryList",
+  "metadata": {},
+  "items": [
+    {
+      "apiVersion": "v1beta1",
+      "kind": "Repository",
+      "metadata": {
+        "creationTimestamp": "2024-04-30T14:05:53Z",
+        "labels": {},
+        "name": "git-init-repo"
+      },
+      "spec": {
+        "url": "https://github.com/flightctl/flightctl-demos",
+        "type": "Git"
+      },
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-04-30T14:06:16Z",
+            "message": "Accessible",
+            "reason": "Accessible",
+            "status": "True",
+            "type": "Accessible"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1beta1",
+      "kind": "Repository",
+      "metadata": {
+        "creationTimestamp": "2024-04-30T15:00:00Z",
+        "labels": {},
+        "name": "oci-registry"
+      },
+      "spec": {
+        "url": "quay.io/example",
+        "type": "oci"
+      },
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-04-30T15:01:00Z",
+            "message": "Accessible",
+            "reason": "Accessible",
+            "status": "True",
+            "type": "Accessible"
+          }
+        ]
+      }
+    }
+  ]
+}

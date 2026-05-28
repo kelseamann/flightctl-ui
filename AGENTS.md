@@ -26,6 +26,7 @@ This file orients AI tools to the flightctl-ui repo layout and conventions. The 
 
 - **Install:** `npm install`
 - **Develop (standalone):** `npm run dev` (or `npm run dev:kind` for kind backend)
+- **Develop (offline, no cluster):** `npm run dev:mock` — Go proxy serves `proxy/fixtures/` JSON (`DEV_MOCK_API=true`); see [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Build:** `npm run build`
 - **Lint:** `npm run lint` (includes ESLint, Prettier, and i18n check)
 

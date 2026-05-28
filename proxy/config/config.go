@@ -26,6 +26,10 @@ var (
 	// origin (e.g. TLS termination at an ingress). When false, only r.TLS and r.Host are used.
 	// Set to true when a trusted reverse proxy sets these headers; see also TrustedProxyNets.
 	TrustXForwardedHeaders = parseBoolEnv("TRUST_X_FORWARDED_HEADERS", false)
+	DevMockAPI             = parseBoolEnv("DEV_MOCK_API", false)
+	DevMockFixturesDir     = getEnvVar("DEV_MOCK_FIXTURES_DIR", "")
+	DevMockUser            = getEnvVar("DEV_MOCK_USER", "dev-user")
+	DevMockOrg             = getEnvVar("DEV_MOCK_ORG", "default")
 )
 
 // trustedProxyNets is parsed from TRUSTED_PROXY_CIDRS (comma-separated). When non-empty and
