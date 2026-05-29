@@ -15,6 +15,7 @@ const BG_IMAGES_DIRNAME = 'bgimages';
 const ASSET_PATH = process.env.ASSET_PATH || '/';
 
 const NODE_ENV: Configuration['mode'] = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+const DEV_PROXY_TARGET = process.env.DEV_PROXY_TARGET || 'http://localhost:3001';
 
 const config: Configuration & {
   devServer?: WebpackDevServerConfiguration;
@@ -36,6 +37,15 @@ const config: Configuration & {
       writeToDisk: true,
       index: process.env.IS_RHEM ? 'index-rhem.html' : 'index.html',
     },
+    // Same-origin API in dev: browser → :9000/api/* → Go proxy on :3001 (mock or real).
+    proxy: [
+      {
+        context: ['/api'],
+        target: DEV_PROXY_TARGET,
+        changeOrigin: true,
+        ws: true,
+      },
+    ],
   },
   module: {
     rules: [
@@ -194,9 +204,10 @@ if (NODE_ENV === 'production') {
   );
   config.devtool = 'source-map';
 } else {
+  // Empty API_PORT → apiCalls uses window.location.port (9000) and webpack proxies /api.
   config.plugins?.push(
     new DefinePlugin({
-      'window.API_PORT': JSON.stringify(process.env.API_PORT) || '3001',
+      'window.API_PORT': JSON.stringify(process.env.API_PORT ?? ''),
     }),
   );
 }

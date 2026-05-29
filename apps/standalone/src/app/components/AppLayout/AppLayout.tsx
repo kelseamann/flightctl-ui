@@ -20,6 +20,7 @@ import OrganizationGuard, {
 } from '@flightctl/ui-components/src/components/common/OrganizationGuard';
 import OrganizationSelector from '@flightctl/ui-components/src/components/common/OrganizationSelector';
 import PageNavigation from '@flightctl/ui-components/src/components/common/PageNavigation';
+import UxBranchSwitcher from '@flightctl/ui-components/src/components/common/UxBranchSwitcher';
 import { useTranslation } from '@flightctl/ui-components/src/hooks/useTranslation';
 import { SystemRestoreProvider } from '@flightctl/ui-components/src/hooks/useSystemRestoreContext';
 import { PermissionsContextProvider } from '@flightctl/ui-components/src/components/common/PermissionsContext';
@@ -27,6 +28,8 @@ import { useBrandLogo } from '../../hooks/useBrandLogo';
 
 import AppNavigation from './AppNavigation';
 import AppToolbar from './AppToolbar';
+
+import './AppLayout.css';
 
 const AppLayoutContent = () => {
   const { t } = useTranslation();
@@ -52,10 +55,13 @@ const AppLayoutContent = () => {
             data-testid="nav-toggle"
           />
         </MastheadToggle>
-        <MastheadBrand>
+        <MastheadBrand className="fctl-masthead-brand">
           <MastheadLogo>
             <Brand src={logo} alt={altText} heights={{ default: '50px' }} />
           </MastheadLogo>
+          <div className="fctl-masthead-branch-switcher">
+            <UxBranchSwitcher />
+          </div>
         </MastheadBrand>
       </MastheadMain>
       <MastheadContent>

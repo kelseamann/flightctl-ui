@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { Button, Content, Flex, FlexItem, Icon, Stack, StackItem, Title } from '@patternfly/react-core';
-import { ExpandableRowContent, OnSelect, Tbody, Td, Tr } from '@patternfly/react-table';
+import { ActionsColumn, ExpandableRowContent, IAction, OnSelect, Tbody, Td, Tr } from '@patternfly/react-table';
 import { ExclamationCircleIcon } from '@patternfly/react-icons/dist/js/icons/exclamation-circle-icon';
 
 import { ImageBuild, ImageBuildConditionReason, ImagePromotion } from '@flightctl/types/imagebuilder';
+import ImagePromotionStatus from '../ImagePromotion/ImagePromotionStatus';
 import { ImageBuildWithExports } from '../../types/extraTypes';
 import { useTranslation } from '../../hooks/useTranslation';
 import { ROUTE, useNavigate } from '../../hooks/useNavigate';
@@ -11,11 +12,9 @@ import { getImageBuildImage, getImageBuildStatusReason, isImageBuildCancelable }
 import { getDateDisplay } from '../../utils/dates';
 import ResourceLink from '../common/ResourceLink';
 import ImageBuildExportsGallery from './ImageBuildDetails/ImageBuildExportsGallery';
-import ImageBuildStatusCell from './columnBug/ImageBuildStatusCell';
-import ImageBuildRowKebab from './columnBug/ImageBuildRowKebab';
-import { mapImageBuildToColumnBugState } from './columnBug/mapImageBuildState';
+import { ImageBuildStatusDisplay } from './ImageBuildAndExportStatus';
 
-type ImageBuildRowProps = {
+type ImageBuildMainRowProps = {
   imageBuild: ImageBuildWithExports;
   rowIndex: number;
   onRowSelect: (imageBuild: ImageBuild) => OnSelect;
@@ -32,7 +31,7 @@ type ImageBuildRowProps = {
   latestPromotion?: ImagePromotion;
 };
 
-const ImageBuildRow = ({
+const ImageBuildMainRow = ({
   imageBuild,
   rowIndex,
   onRowSelect,
@@ -47,18 +46,48 @@ const ImageBuildRow = ({
   onAddToCatalog,
   canAddToCatalog,
   latestPromotion,
-}: ImageBuildRowProps) => {
+}: ImageBuildMainRowProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = React.useState(false);
 
   const imageBuildName = imageBuild.metadata.name || '';
   const buildReason = getImageBuildStatusReason(imageBuild);
-  const { buildStatus, pipelineStatus, catalogSync, pipelineSteps } = mapImageBuildToColumnBugState(
-    imageBuild,
-    latestPromotion,
-    canAddToCatalog,
-  );
+
+  const actions: IAction[] = [
+    {
+      title: t('View details'),
+      onClick: () => {
+        navigate({ route: ROUTE.IMAGE_BUILD_DETAILS, postfix: imageBuildName });
+      },
+    },
+  ];
+
+  if (canNewVersion) {
+    actions.push({
+      title: t('Rebuild'),
+      onClick: onNewVersionClick,
+    });
+  }
+
+  if (canAddToCatalog) {
+    actions.push({
+      title: t('Add to catalog'),
+      onClick: onAddToCatalog,
+    });
+  }
+
+  if (canCancel && isImageBuildCancelable(buildReason)) {
+    actions.push({
+      title: t('Cancel image build'),
+      onClick: onCancelClick,
+    });
+  } else if (canDelete) {
+    actions.push({
+      title: t('Delete image build'),
+      onClick: onDeleteClick,
+    });
+  }
 
   const sourceImage = getImageBuildImage(imageBuild.spec.source);
   const destinationImage = getImageBuildImage(imageBuild.spec.destination);
@@ -85,39 +114,15 @@ const ImageBuildRow = ({
         </Td>
         <Td dataLabel={t('Base image')}>{sourceImage}</Td>
         <Td dataLabel={t('Image output')}>{destinationImage}</Td>
-        <Td dataLabel={t('Status')} className="rhem-col-status">
-          <ImageBuildStatusCell
-            buildName={imageBuildName}
-            buildStatus={buildStatus}
-            pipelineStatus={pipelineStatus}
-            catalogSync={catalogSync}
-            pipelineSteps={pipelineSteps}
-            variant="status"
-          />
+        <Td dataLabel={t('Build status')}>
+          <ImageBuildStatusDisplay buildStatus={imageBuild.status} />
         </Td>
-        <Td dataLabel={t('Actions')} className="rhem-col-actions">
-          <ImageBuildStatusCell
-            buildName={imageBuildName}
-            buildStatus={buildStatus}
-            pipelineStatus={pipelineStatus}
-            catalogSync={catalogSync}
-            pipelineSteps={pipelineSteps}
-            variant="actions"
-            onRetry={canNewVersion ? onNewVersionClick : undefined}
-            onPushToCatalog={canAddToCatalog ? onAddToCatalog : undefined}
-            onOpenCatalog={() => navigate(ROUTE.CATALOG)}
-          />
+        <Td dataLabel={t('Promotion status')}>
+          {latestPromotion ? <ImagePromotionStatus promotion={latestPromotion} /> : '-'}
         </Td>
-        <Td dataLabel={t('Last updated')}>{getDateDisplay(imageBuild.metadata.creationTimestamp)}</Td>
-        <Td>
-          <ImageBuildRowKebab
-            buildName={imageBuildName}
-            onViewDetails={() => navigate({ route: ROUTE.IMAGE_BUILD_DETAILS, postfix: imageBuildName })}
-            onRetryBuild={canNewVersion ? onNewVersionClick : undefined}
-            onNewPushToCatalog={canAddToCatalog ? onAddToCatalog : undefined}
-            onCancel={canCancel && isImageBuildCancelable(buildReason) ? onCancelClick : undefined}
-            onDelete={canDelete && !isImageBuildCancelable(buildReason) ? onDeleteClick : undefined}
-          />
+        <Td dataLabel={t('Date')}>{getDateDisplay(imageBuild.metadata.creationTimestamp)}</Td>
+        <Td isActionCell>
+          <ActionsColumn items={actions} />
         </Td>
       </Tr>
       <Tr isExpanded={isExpanded}>
@@ -182,4 +187,4 @@ const ImageBuildRow = ({
   );
 };
 
-export default ImageBuildRow;
+export default ImageBuildMainRow;

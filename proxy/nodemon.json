@@ -1,0 +1,10 @@
+{
+  "watch": ["mock", "fixtures", "middleware", "auth", "bridge", "config", "server", "app.go"],
+  "ext": "go,json",
+  "exec": "go run app.go",
+  "signal": "SIGKILL",
+  "delay": 500,
+  "events": {
+    "restart": "sh ../hack/kill-dev-ports.sh 3001"
+  }
+}

@@ -11,6 +11,7 @@ import {
   PanelMainBody,
   Toolbar,
   ToolbarContent,
+  ToolbarGroup,
   ToolbarItem,
   Tooltip,
 } from '@patternfly/react-core';
@@ -118,41 +119,47 @@ const PageNavigation = ({ showSettings = true }: { showSettings?: boolean }) => 
           <PanelMainBody>
             <Toolbar isFullHeight isStatic className="fctl-subnav_toolbar">
               <ToolbarContent>
-                {showOrganizationSelection && (
+                <ToolbarGroup
+                  className="fctl-subnav_toolbar-actions"
+                  align={{ default: 'alignEnd' }}
+                  gap={{ default: 'gapMd' }}
+                >
+                  {showOrganizationSelection && (
+                    <ToolbarItem>
+                      <OrganizationDropdown
+                        organizationName={currentOrgDisplayName}
+                        onSwitchOrganization={() => {
+                          setShowOrganizationModal(true);
+                        }}
+                      />
+                    </ToolbarItem>
+                  )}
                   <ToolbarItem>
-                    <OrganizationDropdown
-                      organizationName={currentOrgDisplayName}
-                      onSwitchOrganization={() => {
-                        setShowOrganizationModal(true);
-                      }}
-                    />
-                  </ToolbarItem>
-                )}
-                <ToolbarItem>
-                  <Tooltip content={t('Copy login command')}>
-                    <Button
-                      variant="link"
-                      aria-label={t('Copy login command')}
-                      onClick={() => setShowLoginCommandModal(true)}
-                    >
-                      {t('Copy login command')}
-                    </Button>
-                  </Tooltip>
-                </ToolbarItem>
-                {isAdmin && showSettings && (
-                  <ToolbarItem>
-                    <Tooltip content={t('Manage authentication providers')}>
+                    <Tooltip content={t('Copy login command')}>
                       <Button
                         variant="link"
-                        aria-label={t('Settings')}
-                        onClick={() => navigate(ROUTE.AUTH_PROVIDERS)}
-                        icon={<CogIcon />}
+                        aria-label={t('Copy login command')}
+                        onClick={() => setShowLoginCommandModal(true)}
                       >
-                        {t('Settings')}
+                        {t('Copy login command')}
                       </Button>
                     </Tooltip>
                   </ToolbarItem>
-                )}
+                  {isAdmin && showSettings && (
+                    <ToolbarItem>
+                      <Tooltip content={t('Manage authentication providers')}>
+                        <Button
+                          variant="link"
+                          aria-label={t('Settings')}
+                          onClick={() => navigate(ROUTE.AUTH_PROVIDERS)}
+                          icon={<CogIcon />}
+                        >
+                          {t('Settings')}
+                        </Button>
+                      </Tooltip>
+                    </ToolbarItem>
+                  )}
+                </ToolbarGroup>
               </ToolbarContent>
             </Toolbar>
           </PanelMainBody>

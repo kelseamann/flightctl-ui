@@ -1,0 +1,10 @@
+.fctl-masthead-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-t--global--spacer--md);
+}
+
+.fctl-masthead-branch-switcher {
+  display: flex;
+  align-items: center;
+}

@@ -79,7 +79,12 @@ export const Table = ({
           {!emptyData && singleSelect && <Th screenReaderText={t('Row select')} />}
           {isExpandable && !emptyData && <Th screenReaderText={t('Expand row')} />}
           {columns.map((c) => (
-            <Th key={c.name} {...c.thProps} aria-label={c.name} className="fctl-tableth__helper-text">
+            <Th
+              key={c.name}
+              {...c.thProps}
+              aria-label={c.name}
+              className={['fctl-tableth__helper-text', c.thProps?.className].filter(Boolean).join(' ')}
+            >
               {c.helperText ? (
                 <LabelWithHelperText label={c.name} content={c.helperText} triggerAction="hover" />
               ) : (

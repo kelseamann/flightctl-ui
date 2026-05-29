@@ -6,22 +6,30 @@
 
 set -eu
 
+release_port() {
+  port="$1"
+  attempt=0
+  while [ "$attempt" -lt 10 ]; do
+    pids=$(lsof -nP -iTCP:"$port" -sTCP:LISTEN -t 2>/dev/null || true)
+    if [ -z "$pids" ]; then
+      return 0
+    fi
+    if [ "$attempt" -eq 0 ]; then
+      echo "Releasing port ${port} (listener PIDs: ${pids})"
+    fi
+    # shellcheck disable=SC2086
+    kill -9 ${pids} 2>/dev/null || true
+    sleep 0.4
+    attempt=$((attempt + 1))
+  done
+  echo "warning: port ${port} still in use after cleanup" >&2
+  return 1
+}
+
 if [ "$#" -eq 0 ]; then
   set -- 3001 9000
 fi
 
 for port in "$@"; do
-  pids=$(lsof -nP -iTCP:"$port" -sTCP:LISTEN -t 2>/dev/null || true)
-  if [ -z "$pids" ]; then
-    continue
-  fi
-  echo "Releasing port ${port} (listener PIDs: ${pids})"
-  # shellcheck disable=SC2086
-  kill ${pids} 2>/dev/null || true
-  sleep 0.3
-  pids=$(lsof -nP -iTCP:"$port" -sTCP:LISTEN -t 2>/dev/null || true)
-  if [ -n "$pids" ]; then
-    # shellcheck disable=SC2086
-    kill -9 ${pids} 2>/dev/null || true
-  fi
+  release_port "$port" || true
 done

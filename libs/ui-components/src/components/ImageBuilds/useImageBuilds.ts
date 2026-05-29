@@ -29,9 +29,12 @@ export const useImageBuildsBackendFilters = () => {
 
   const setName = React.useCallback(
     (nameVal: string) => {
-      const newParams = new URLSearchParams({
-        [ImageBuildsSearchParams.Name]: nameVal,
-      });
+      const newParams = new URLSearchParams(paramsRef.current);
+      if (nameVal) {
+        newParams.set(ImageBuildsSearchParams.Name, nameVal);
+      } else {
+        newParams.delete(ImageBuildsSearchParams.Name);
+      }
       paramsRef.current = newParams;
       setSearchParams(newParams);
     },

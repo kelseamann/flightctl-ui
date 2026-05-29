@@ -17,6 +17,7 @@ import { RESOURCE, VERB } from '../../types/rbac';
 import { useTableSelect } from '../../hooks/useTableSelect';
 import { useTranslation } from '../../hooks/useTranslation';
 import { ROUTE, useNavigate } from '../../hooks/useNavigate';
+import { useUxBranch } from '../../hooks/useUxBranch';
 import ResourceListEmptyState from '../common/ResourceListEmptyState';
 import PageWithPermissions from '../common/PageWithPermissions';
 import { usePermissionsContext } from '../common/PermissionsContext';
@@ -31,29 +32,35 @@ import CancelImageBuildModal from './CancelImageBuildModal/CancelImageBuildModal
 import DeleteImageBuildModal from './DeleteImageBuildModal/DeleteImageBuildModal';
 import { useImageBuildLatestPromotions, useImageBuilds, useImageBuildsBackendFilters } from './useImageBuilds';
 import ImageBuildRow from './ImageBuildRow';
+import ImageBuildMainRow from './ImageBuildMainRow';
 import { OciRegistriesContextProvider } from './OciRegistriesContext';
 import ImagePromotionModal from '../ImagePromotion/ImagePromotionModal';
 import { ImageBuildWithExports } from '../../types/extraTypes';
 
-const getColumns = (t: TFunction) => [
+import './columnBug/ImageBuildColumnBugTable.css';
+
+const getMainColumns = (t: TFunction) => [
+  { name: t('Name') },
+  { name: t('Base image') },
+  { name: t('Image output') },
+  { name: t('Build status') },
+  { name: t('Promotion status') },
+  { name: t('Date') },
+];
+
+const getColumnFixColumns = (t: TFunction) => [
+  { name: t('Name') },
+  { name: t('Base image') },
+  { name: t('Image output') },
   {
-    name: t('Name'),
+    name: t('Status'),
+    thProps: { className: 'rhem-col-status' },
   },
   {
-    name: t('Base image'),
+    name: t('Actions'),
+    thProps: { className: 'rhem-col-actions' },
   },
-  {
-    name: t('Image output'),
-  },
-  {
-    name: t('Build status'),
-  },
-  {
-    name: t('Promotion status'),
-  },
-  {
-    name: t('Date'),
-  },
+  { name: t('Last updated') },
 ];
 
 const imageBuildTablePermissions = [
@@ -86,8 +93,12 @@ const ImageBuildsEmptyState = ({ onCreateClick }: { onCreateClick?: VoidFunction
 const ImageBuildTable = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isColumnFixBranch } = useUxBranch();
 
-  const imageBuildColumns = React.useMemo(() => getColumns(t), [t]);
+  const imageBuildColumns = React.useMemo(
+    () => (isColumnFixBranch ? getColumnFixColumns(t) : getMainColumns(t)),
+    [isColumnFixBranch, t],
+  );
   const { name, setName, hasFiltersEnabled } = useImageBuildsBackendFilters();
   const { imageBuilds, isLoading, error, isUpdating, refetch, pagination } = useImageBuilds({ name });
   const { onRowSelect, isAllSelected, hasSelectedRows, isRowSelected, setAllSelected } = useTableSelect();
@@ -110,6 +121,14 @@ const ImageBuildTable = () => {
   const handleCreateClick = React.useCallback(() => {
     navigate(ROUTE.IMAGE_BUILD_CREATE);
   }, [navigate]);
+
+  const rowProps = {
+    canDelete,
+    canCancel,
+    canNewVersion,
+    refetch,
+    canAddToCatalog: canPromote,
+  };
 
   return (
     <ListPageBody error={error} loading={isLoading}>
@@ -136,42 +155,43 @@ const ImageBuildTable = () => {
           )}
         </ToolbarContent>
       </Toolbar>
-      <Table
-        aria-label={t('Image builds table')}
-        loading={isUpdating}
-        columns={imageBuildColumns}
-        hasFilters={hasFiltersEnabled}
-        emptyData={imageBuilds.length === 0}
-        clearFilters={() => setName('')}
-        isAllSelected={isAllSelected}
-        onSelectAll={setAllSelected}
-        isExpandable
-      >
-        {imageBuilds.map((imageBuild, rowIndex) => {
-          const name = imageBuild.metadata.name || '';
-          return (
-            <ImageBuildRow
-              key={name}
-              imageBuild={imageBuild}
-              rowIndex={rowIndex}
-              canDelete={canDelete}
-              canCancel={canCancel}
-              canNewVersion={canNewVersion}
-              onDeleteClick={() => {
-                setImageBuildToDeleteId(name);
-              }}
-              onCancelClick={() => setImageBuildToCancelId(name)}
-              onNewVersionClick={() => navigate({ route: ROUTE.IMAGE_BUILD_NEW_VERSION, postfix: name })}
-              isRowSelected={() => isRowSelected(imageBuild)}
-              onRowSelect={() => onRowSelect(imageBuild)}
-              onAddToCatalog={() => setImageBuildToCatalog(imageBuild)}
-              canAddToCatalog={canPromote}
-              refetch={refetch}
-              latestPromotion={latestPromotionsByBuild[name]}
-            />
-          );
-        })}
-      </Table>
+      <div className={isColumnFixBranch ? 'rhem-image-builds-table' : undefined}>
+        <Table
+          aria-label={t('Image builds table')}
+          loading={isUpdating}
+          columns={imageBuildColumns}
+          hasFilters={hasFiltersEnabled}
+          emptyData={imageBuilds.length === 0}
+          clearFilters={() => setName('')}
+          isAllSelected={isAllSelected}
+          onSelectAll={setAllSelected}
+          isExpandable
+          variant={isColumnFixBranch ? 'compact' : undefined}
+        >
+          {imageBuilds.map((imageBuild, rowIndex) => {
+            const buildName = imageBuild.metadata.name || '';
+            const sharedRowProps = {
+              key: buildName,
+              imageBuild,
+              rowIndex,
+              onDeleteClick: () => setImageBuildToDeleteId(buildName),
+              onCancelClick: () => setImageBuildToCancelId(buildName),
+              onNewVersionClick: () => navigate({ route: ROUTE.IMAGE_BUILD_NEW_VERSION, postfix: buildName }),
+              isRowSelected: () => isRowSelected(imageBuild),
+              onRowSelect: () => onRowSelect(imageBuild),
+              onAddToCatalog: () => setImageBuildToCatalog(imageBuild),
+              latestPromotion: latestPromotionsByBuild[buildName],
+              ...rowProps,
+            };
+
+            return isColumnFixBranch ? (
+              <ImageBuildRow {...sharedRowProps} />
+            ) : (
+              <ImageBuildMainRow {...sharedRowProps} />
+            );
+          })}
+        </Table>
+      </div>
       <TablePagination pagination={pagination} isUpdating={isUpdating} />
       {!isUpdating && imageBuilds.length === 0 && !name && (
         <ImageBuildsEmptyState onCreateClick={canCreate ? handleCreateClick : undefined} />
