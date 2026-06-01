@@ -1,11 +1,5 @@
 import * as React from 'react';
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownList,
-  MenuToggle,
-  MenuToggleElement,
-} from '@patternfly/react-core';
+import { Dropdown, DropdownItem, DropdownList, MenuToggle, MenuToggleElement } from '@patternfly/react-core';
 import EllipsisVIcon from '@patternfly/react-icons/dist/js/icons/ellipsis-v-icon';
 
 import { useTranslation } from '../../../hooks/useTranslation';
@@ -40,9 +34,7 @@ const ImageBuildRowKebab = ({
     () =>
       [
         { id: VIEW_DETAILS_ACTION, label: t('View details'), onClick: onViewDetails },
-        onRetryBuild
-          ? { id: RETRY_BUILD_ACTION, label: t('Retry build'), onClick: onRetryBuild }
-          : undefined,
+        onRetryBuild ? { id: RETRY_BUILD_ACTION, label: t('Retry build'), onClick: onRetryBuild } : undefined,
         onNewPushToCatalog
           ? {
               id: NEW_PUSH_TO_CATALOG_ACTION,
@@ -50,12 +42,8 @@ const ImageBuildRowKebab = ({
               onClick: onNewPushToCatalog,
             }
           : undefined,
-        onCancel
-          ? { id: CANCEL_IMAGE_BUILD_ACTION, label: t('Cancel image build'), onClick: onCancel }
-          : undefined,
-        onDelete
-          ? { id: DELETE_IMAGE_BUILD_ACTION, label: t('Delete image build'), onClick: onDelete }
-          : undefined,
+        onCancel ? { id: CANCEL_IMAGE_BUILD_ACTION, label: t('Cancel image build'), onClick: onCancel } : undefined,
+        onDelete ? { id: DELETE_IMAGE_BUILD_ACTION, label: t('Delete image build'), onClick: onDelete } : undefined,
       ].filter((action): action is NonNullable<typeof action> => Boolean(action)),
     [onCancel, onDelete, onNewPushToCatalog, onRetryBuild, onViewDetails, t],
   );

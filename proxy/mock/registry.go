@@ -57,7 +57,15 @@ func (s *Store) resolveGet(pathOnly string, fieldSelector string) ([]byte, int, 
 	case "api/v1/fleets":
 		return s.mustRead("flightctl/fleets.list.json")
 	case "api/v1/repositories":
-		return s.mustRead("flightctl/repositories.list.json")
+		data, status, err := s.mustRead("flightctl/repositories.list.json")
+		if err != nil {
+			return nil, status, err
+		}
+		filtered, filterErr := filterRepositoryList(data, fieldSelector)
+		if filterErr != nil {
+			return nil, http.StatusInternalServerError, filterErr
+		}
+		return filtered, status, nil
 	case "api/v1/resourcesyncs":
 		data, status, err := s.mustRead("flightctl/resourcesyncs.list.json")
 		if err != nil {

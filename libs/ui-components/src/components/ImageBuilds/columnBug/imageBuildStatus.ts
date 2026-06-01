@@ -1,4 +1,4 @@
-import type { BuildStatus, CatalogSyncStatus } from './types';
+import type { CatalogSyncStatus } from './types';
 
 export function isEligibleToPublish(
   status: string,

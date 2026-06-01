@@ -7,6 +7,34 @@
     {
       "resource": "resourcesyncs",
       "operations": ["list", "get", "create", "delete", "patch", "update"]
+    },
+    {
+      "resource": "imagebuilds",
+      "operations": ["create", "list", "get", "delete"]
+    },
+    {
+      "resource": "imagebuilds/cancel",
+      "operations": ["create"]
+    },
+    {
+      "resource": "imagebuilds/newversion",
+      "operations": ["create"]
+    },
+    {
+      "resource": "imagepromotions",
+      "operations": ["create", "list", "get"]
+    },
+    {
+      "resource": "catalogs",
+      "operations": ["list", "get", "create", "patch", "delete"]
+    },
+    {
+      "resource": "catalogitems",
+      "operations": ["list", "get", "create", "patch", "delete"]
+    },
+    {
+      "resource": "repositories",
+      "operations": ["list", "get", "create", "patch", "delete"]
     }
   ]
 }

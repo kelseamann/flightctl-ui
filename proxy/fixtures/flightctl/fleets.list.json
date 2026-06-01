@@ -44,7 +44,15 @@
         }
       },
       "status": {
-        "conditions": [],
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-04-10T12:12:00Z",
+            "message": "Valid",
+            "reason": "Valid",
+            "status": "True",
+            "type": "Valid"
+          }
+        ],
         "devicesSummary": {
           "total": 0,
           "applicationStatus": {},
@@ -94,7 +102,15 @@
         }
       },
       "status": {
-        "conditions": [],
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-04-10T12:12:00Z",
+            "message": "Valid",
+            "reason": "Valid",
+            "status": "True",
+            "type": "Valid"
+          }
+        ],
         "devicesSummary": {
           "total": 0,
           "applicationStatus": {},
@@ -141,7 +157,15 @@
         }
       },
       "status": {
-        "conditions": [],
+        "conditions": [
+          {
+            "lastTransitionTime": "2024-04-10T12:12:00Z",
+            "message": "Valid",
+            "reason": "Valid",
+            "status": "True",
+            "type": "Valid"
+          }
+        ],
         "devicesSummary": {
           "total": 0,
           "applicationStatus": {},

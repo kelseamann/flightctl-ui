@@ -48,7 +48,7 @@
       "kind": "ResourceSync",
       "metadata": {
         "creationTimestamp": "2024-04-10T11:00:00Z",
-        "generation": 2,
+        "generation": 3,
         "name": "rs-pending-fleet"
       },
       "spec": {
@@ -66,6 +66,20 @@
             "reason": "Accessible",
             "status": "True",
             "type": "Accessible"
+          },
+          {
+            "lastTransitionTime": "2024-04-10T11:02:00Z",
+            "message": "Parsed",
+            "reason": "Parsed",
+            "status": "True",
+            "type": "ResourceParsed"
+          },
+          {
+            "lastTransitionTime": "2024-04-10T11:03:00Z",
+            "message": "Synced",
+            "reason": "Synced",
+            "status": "True",
+            "type": "Synced"
           }
         ]
       }
@@ -75,7 +89,7 @@
       "kind": "ResourceSync",
       "metadata": {
         "creationTimestamp": "2024-04-10T12:00:00Z",
-        "generation": 1,
+        "generation": 2,
         "name": "rs-error-fleet"
       },
       "spec": {
@@ -96,10 +110,17 @@
           },
           {
             "lastTransitionTime": "2024-04-10T12:02:00Z",
-            "message": "Failed to parse resources: invalid YAML in fleet template",
-            "reason": "ParseFailed",
-            "status": "False",
+            "message": "Parsed",
+            "reason": "Parsed",
+            "status": "True",
             "type": "ResourceParsed"
+          },
+          {
+            "lastTransitionTime": "2024-04-10T12:03:00Z",
+            "message": "Synced",
+            "reason": "Synced",
+            "status": "True",
+            "type": "Synced"
           }
         ]
       }

@@ -31,19 +31,8 @@ const ImageBuildStatusCell = ({
   variant = 'status',
 }: ImageBuildStatusCellProps) => {
   const includeCatalogStep = pipelineSteps === 3;
-  const canPublish = isEligibleToPublish(
-    buildStatus,
-    pipelineStatus,
-    catalogSync,
-    includeCatalogStep,
-  );
-  const actionLabel = rowActionLabel(
-    buildStatus,
-    pipelineStatus,
-    catalogSync,
-    canPublish,
-    includeCatalogStep,
-  );
+  const canPublish = isEligibleToPublish(buildStatus, pipelineStatus, catalogSync, includeCatalogStep);
+  const actionLabel = rowActionLabel(buildStatus, pipelineStatus, catalogSync, canPublish, includeCatalogStep);
   const statusNote = stageHelperText(
     buildStatus,
     pipelineStatus,

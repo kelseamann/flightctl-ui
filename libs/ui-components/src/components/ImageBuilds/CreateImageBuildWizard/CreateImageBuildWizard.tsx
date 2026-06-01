@@ -35,11 +35,16 @@ import { useFetch } from '../../../hooks/useFetch';
 import { OciRegistriesContextProvider, useOciRegistriesContext } from '../OciRegistriesContext';
 import { isWizardStepDisabled } from '../../../utils/wizards';
 import CatalogStep, { catalogStepId, isCatalogStepValid } from './steps/CatalogStep';
+import { isDevMockApi } from '../../../utils/devMock';
+import { getDevMockImageBuildInitialValues } from '../../../utils/devMockWizardDefaults';
 import { getImagePromotion } from '../NewVersionImageBuildWizard/utils';
 
 const orderedIds = [sourceImageStepId, outputImageStepId, registrationStepId, catalogStepId, reviewStepId];
 
 const getValidStepIds = (formikErrors: FormikErrors<ImageBuildFormValues>): string[] => {
+  if (isDevMockApi()) {
+    return orderedIds;
+  }
   const validStepIds: string[] = [];
   if (isSourceImageStepValid(formikErrors)) {
     validStepIds.push(sourceImageStepId);
@@ -99,7 +104,11 @@ const CreateImageBuildWizard = () => {
             </Alert>
           ) : (
             <Formik<ImageBuildFormValues>
-              initialValues={{ ...getInitialValues(), promoteToCatalog: canPromote }}
+              initialValues={
+                isDevMockApi()
+                  ? { ...getDevMockImageBuildInitialValues(), promoteToCatalog: false }
+                  : { ...getInitialValues(), promoteToCatalog: canPromote }
+              }
               validationSchema={getValidationSchema(t)}
               validateOnMount
               onSubmit={async (values) => {

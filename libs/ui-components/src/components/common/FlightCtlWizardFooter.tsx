@@ -12,6 +12,7 @@ import {
 
 import { useTranslation } from '../../hooks/useTranslation';
 import { useNavigate } from '../../hooks/useNavigate';
+import { isDevMockApi } from '../../utils/devMock';
 
 export type FlightCtlWizardFooterProps<T extends Record<string, unknown>> = {
   firstStepId: string;
@@ -39,7 +40,7 @@ const FlightCtlWizardFooter = <T extends Record<string, unknown>>({
   const navigate = useNavigate();
 
   const isSubmitStep = activeStep.id === submitStepId;
-  const stepValid = validateStep(String(activeStep.id), errors, values);
+  const stepValid = isDevMockApi() || validateStep(String(activeStep.id), errors, values);
 
   const onMoveNext = () => {
     goToNextStep();

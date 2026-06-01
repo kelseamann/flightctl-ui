@@ -328,15 +328,13 @@ cd proxy && go test ./mock/...
 
 ### ResourceSync alert fixtures
 
-`ResourceSyncImportStatus` shows alerts when `status.conditions` imply pending or error states (see `libs/ui-components/src/utils/status/repository.ts`). Fleet import banners use fixtures in `resourcesyncs.list.json`:
+`ResourceSyncImportStatus` shows alerts when `status.conditions` imply pending or error states (see `libs/ui-components/src/utils/status/repository.ts`). Default mock fleet resource syncs in `resourcesyncs.list.json` are fully synced so the Fleets page shows no import banners:
 
-- `rs-pending-fleet` — accessible but not synced (info alert on Fleets)
-- `rs-error-fleet` — parse failed (error alert on Fleets)
-- `rs-synced-fleet` — fully synced (no banner)
+- `rs-synced-fleet`, `rs-pending-fleet`, and `rs-error-fleet` — all synced (no banner)
 
 Detail routes: `resourcesyncs.detail.rs-pending-fleet.json` and `resourcesyncs.detail.rs-error-fleet.json` (also used when opening `/devicemanagement/resourcesyncs/:rsId`).
 
-If alerts were dismissed earlier, clear `localStorage` key `FC_DISMISS_SYNCS`.
+If alerts were dismissed earlier while fixtures still had error/pending states, clear `localStorage` key `FC_DISMISS_SYNCS`.
 
 ---
 

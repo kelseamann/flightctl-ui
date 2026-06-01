@@ -23,6 +23,20 @@ Open **http://localhost:9000** (the proxy on port 3001 runs in the background; t
 
 See **[CONTRIBUTING.md](CONTRIBUTING.md)** for fork setup, troubleshooting, extending fixtures, and when to switch to a real `FLIGHTCTL_SERVER`.
 
+### UX branch switcher
+
+In mock dev mode, the masthead includes a **Branch** dropdown (`Branch: main`, `Branch: image-builds-column-fix`, etc.). Use it to preview UX prototype variants without changing git branches:
+
+- **`main`** — default product UI
+- **`image-builds-column-fix`** — Image Builder table with unified status stepper and kebab actions ([EDM-4056](https://redhat.atlassian.net/browse/EDM-4056))
+- **`EDM-*`** — ticket-scoped UX branches as they are added
+
+The selection is stored in `sessionStorage` and reflected in the URL as `?branch=<id>` so you can bookmark or share a specific variant. Wireframes in Figma should use the matching Jira key as the page name where applicable.
+
+### Mock wizards for design review
+
+When running `npm run dev:mock`, create/edit wizards (Image builds, Software Catalog, etc.) allow stepping through every step without passing full form validation — sidebar steps stay enabled and **Next** is always clickable. This is for offline UX review and Figma capture only; it does not apply when connected to a real API.
+
 ## Building
 
 ### JavaScript/TypeScript Applications

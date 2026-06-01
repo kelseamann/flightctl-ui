@@ -38,10 +38,15 @@ import { getErrorMessage } from '../../../utils/error';
 import { usePermissionsContext } from '../../common/PermissionsContext';
 import PageWithPermissions from '../../common/PageWithPermissions';
 import { RESOURCE, VERB } from '../../../types/rbac';
+import { isDevMockApi } from '../../../utils/devMock';
+import { getDevMockCatalogItemInitialValues } from '../../../utils/devMockWizardDefaults';
 
 const orderedIds = [generalInfoStepId, typeConfigStepId, versionStepId, reviewStepId];
 
 const getValidStepIds = (formikErrors: FormikErrors<AddCatalogItemFormValues>): string[] => {
+  if (isDevMockApi()) {
+    return orderedIds;
+  }
   const validStepIds: string[] = [];
   if (isGeneralInfoStepValid(formikErrors)) {
     validStepIds.push(generalInfoStepId);
@@ -106,7 +111,11 @@ const AddCatalogItemWizard = () => {
     void fetchItem();
   }, [get, isEdit, catalogId, itemId]);
 
-  const initialValues = editItem ? getInitialValuesFromItem(editItem) : getInitialValues();
+  const initialValues = editItem
+    ? getInitialValuesFromItem(editItem)
+    : isDevMockApi()
+      ? getDevMockCatalogItemInitialValues()
+      : getInitialValues();
   const isReadOnly = !!editItem?.metadata?.owner;
 
   let pageTitle: string;

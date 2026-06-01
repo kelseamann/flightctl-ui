@@ -44,6 +44,8 @@ const config: Configuration & {
         target: DEV_PROXY_TARGET,
         changeOrigin: true,
         ws: true,
+        proxyTimeout: 120000,
+        timeout: 120000,
       },
     ],
   },
@@ -208,6 +210,7 @@ if (NODE_ENV === 'production') {
   config.plugins?.push(
     new DefinePlugin({
       'window.API_PORT': JSON.stringify(process.env.API_PORT ?? ''),
+      'window.DEV_MOCK_API': JSON.stringify(process.env.DEV_MOCK_API === 'true'),
     }),
   );
 }

@@ -13,7 +13,7 @@
       },
       "spec": {
         "url": "https://github.com/flightctl/flightctl-demos",
-        "type": "Git"
+        "type": "git"
       },
       "status": {
         "conditions": [
@@ -36,8 +36,17 @@
         "name": "oci-registry"
       },
       "spec": {
-        "url": "quay.io/example",
-        "type": "oci"
+        "type": "oci",
+        "registry": "quay.io",
+        "scheme": "https",
+        "accessMode": "ReadWrite",
+        "baseImages": [
+          {
+            "displayName": "RHEL bootc",
+            "imageName": "rhel9/rhel-bootc",
+            "tags": ["9.6", "latest"]
+          }
+        ]
       },
       "status": {
         "conditions": [

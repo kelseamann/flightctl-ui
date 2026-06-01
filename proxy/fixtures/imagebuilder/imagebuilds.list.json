@@ -39,7 +39,34 @@
         "imageReference": "quay.io/example/output:1.0",
         "architecture": "amd64"
       },
-      "imageexports": []
+      "imageexports": [
+        {
+          "apiVersion": "v1alpha1",
+          "kind": "ImageExport",
+          "metadata": {
+            "name": "demo-build-1-iso-a1b2c3",
+            "creationTimestamp": "2024-04-10T13:00:00Z"
+          },
+          "spec": {
+            "source": {
+              "type": "imageBuild",
+              "imageBuildRef": "demo-build-1"
+            },
+            "format": "iso"
+          },
+          "status": {
+            "conditions": [
+              {
+                "type": "Ready",
+                "status": "True",
+                "lastTransitionTime": "2024-04-10T13:30:00Z",
+                "message": "Export completed successfully",
+                "reason": "Completed"
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "apiVersion": "v1alpha1",

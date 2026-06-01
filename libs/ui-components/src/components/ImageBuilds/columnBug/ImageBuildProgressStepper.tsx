@@ -21,20 +21,15 @@ const ImageBuildProgressStepper = ({
   canPublish,
   pipelineSteps = 3,
 }: ImageBuildProgressStepperProps) => {
-  const { build, export: exportStep, catalog } = getPipelineStepStates(
-    buildStatus,
-    pipelineStatus,
-    catalogSync,
-    canPublish,
-  );
+  const {
+    build,
+    export: exportStep,
+    catalog,
+  } = getPipelineStepStates(buildStatus, pipelineStatus, catalogSync, canPublish);
   const prefix = buildName.replace(/\./g, '-');
 
   return (
-    <ProgressStepper
-      isCompact
-      aria-label={`Build progress for ${buildName}`}
-      className="rhem-build-progress-stepper"
-    >
+    <ProgressStepper isCompact aria-label={`Build progress for ${buildName}`} className="rhem-build-progress-stepper">
       <ProgressStep
         id={`${prefix}-step-build`}
         titleId={`${prefix}-step-build-title`}
