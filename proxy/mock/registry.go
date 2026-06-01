@@ -90,6 +90,10 @@ func (s *Store) resolveGet(pathOnly string, fieldSelector string) ([]byte, int, 
 		return s.resolveCatalogItemDetail(catalogName, itemName)
 	}
 
+	if deviceName, ok := parseDeviceLastSeenPath(pathOnly); ok {
+		return s.resolveDeviceLastSeen(deviceName)
+	}
+
 	if detail, ok := parseDetailPath(pathOnly); ok {
 		return s.resolveFixtureDetail("flightctl/", detail)
 	}

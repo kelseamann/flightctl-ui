@@ -55,7 +55,7 @@ func main() {
 		apiRouter.Handle("/imagebuilder/{forward:.*}", mock.NewImageBuilderHandler(fixtureStore))
 		apiRouter.HandleFunc("/alerts/{forward:.*}", bridge.UnimplementedHandler)
 		apiRouter.HandleFunc("/cli-artifacts", bridge.UnimplementedHandler)
-		apiRouter.HandleFunc("/terminal/{forward:.*}", bridge.UnimplementedHandler)
+		apiRouter.HandleFunc("/terminal/{forward:.*}", mock.NewTerminalHandler(fixtureStore).ServeHTTP)
 		apiRouter.HandleFunc("/test-auth-provider-connection", bridge.UnimplementedHandler)
 
 		if config.OcpPlugin != "true" {

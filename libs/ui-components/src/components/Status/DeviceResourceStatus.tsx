@@ -73,7 +73,7 @@ const DeviceResourceStatus = ({ device, monitorType }: { device: Device | undefi
   let level: StatusLevel;
   let label: string;
   let messageTitle: string = '';
-  const status = device.status?.resources[monitorType];
+  const status = device.status?.resources?.[monitorType];
   const triggeredAlert = getTriggeredResourceAlert(device.spec?.resources ?? [], monitorType, status);
 
   if (triggeredAlert) {

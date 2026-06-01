@@ -212,6 +212,10 @@ The route may have **no fixture** yet. See [Adding fixtures](#adding-or-updating
 
 Enrollment requests can load while the main **Devices** table crashes during render. Mock `devices.list.json` entries must include at least `status.lifecycle`, `status.applicationsSummary`, `status.updated`, and `status.summary` (use enum values from `@flightctl/types`, e.g. `Enrolled`, `Healthy`, `UpToDate`, `Online`). See `proxy/fixtures/flightctl/devices.list.json`.
 
+#### Device details page: “Unexpected error occurred” on the Details tab
+
+The device **list** needs only summary fields; the **details** tab also requires `status.resources` (`cpu`, `memory`, `disk`), `status.applications` (use `[]` if empty), `status.os`, and `status.systemInfo`. Without `status.resources`, the UI throws when rendering resource pressure. Mock `GET api/v1/devices/<name>/lastseen` is supported and returns a sample timestamp when the device exists in the list.
+
 #### `npm run dev:mock` vs Cypress
 
 Cypress `cy.intercept` stubs run **only inside Cypress**. Mock proxy mode works in a **normal browser** without running tests. You may reuse the same JSON shapes as Cypress fixtures under `libs/cypress/fixtures/`.
@@ -232,6 +236,7 @@ Cypress `cy.intercept` stubs run **only inside Cypress**. Mock proxy mode works 
 | `api/v1/repositories` | `flightctl/repositories.list.json` |
 | `api/v1/resourcesyncs` | `flightctl/resourcesyncs.list.json` |
 | `api/v1/devices` | `flightctl/devices.list.json` |
+| `api/v1/devices/<name>/lastseen` | Sample `{ "lastSeen": "..." }` when `<name>` exists in the device list |
 | `api/v1/enrollmentrequests` | `flightctl/enrollmentrequests.list.json` |
 | `api/v1/catalogs` | `flightctl/catalogs.list.json` |
 | `api/v1/catalogitems` | `flightctl/catalogitems.list.json` |
@@ -249,7 +254,10 @@ Routing logic: `proxy/mock/registry.go` and `proxy/mock/registry_catalog.go` (fl
 
 - `/api/alerts/...`
 - `/api/cli-artifacts`
-- `/api/terminal/...` (WebSocket)
+
+### Mock device terminal (WebSocket)
+
+`/api/terminal/<device-id>` upgrades to a **simulated console** when the device exists in `devices.list.json`. The Terminal tab uses an interactive shell (`help`, `clear`, `echo`, `exit`). The Logs tab reuses the same endpoint with a non-interactive session and returns sample `journalctl` lines.
 
 ### Mutations (POST / PUT / PATCH / DELETE)
 

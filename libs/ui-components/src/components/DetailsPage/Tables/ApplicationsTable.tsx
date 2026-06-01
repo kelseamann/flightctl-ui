@@ -9,10 +9,10 @@ import { getAppTypeLabel } from '../../../utils/apps';
 import { RUN_AS_ROOT_USER } from '../../../types/deviceSpec';
 
 type ApplicationsTableProps = {
-  appsStatus: DeviceApplicationStatus[];
+  appsStatus?: DeviceApplicationStatus[];
 };
 
-const ApplicationsTable = ({ appsStatus }: ApplicationsTableProps) => {
+const ApplicationsTable = ({ appsStatus = [] }: ApplicationsTableProps) => {
   const { t } = useTranslation();
 
   if (appsStatus.length === 0) {

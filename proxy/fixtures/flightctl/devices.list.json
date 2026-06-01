@@ -32,6 +32,7 @@
         "applicationsSummary": {
           "status": "Healthy"
         },
+        "applications": [],
         "lifecycle": {
           "status": "Enrolled"
         },
@@ -40,7 +41,24 @@
         },
         "updated": {
           "status": "UpToDate"
-        }
+        },
+        "resources": {
+          "cpu": "Healthy",
+          "memory": "Healthy",
+          "disk": "Healthy"
+        },
+        "os": {
+          "image": "quay.io/solar-farms/ai-inverter:1.5.0"
+        },
+        "systemInfo": {
+          "hostname": "east-device-1",
+          "operatingSystem": "linux",
+          "agentVersion": "0.8.0",
+          "architecture": "amd64",
+          "distroName": "Red Hat Enterprise Linux",
+          "distroVersion": "9.6"
+        },
+        "systemd": []
       }
     },
     {
@@ -72,6 +90,7 @@
         "applicationsSummary": {
           "status": "Healthy"
         },
+        "applications": [],
         "lifecycle": {
           "status": "Enrolled"
         },
@@ -80,7 +99,24 @@
         },
         "updated": {
           "status": "UpToDate"
-        }
+        },
+        "resources": {
+          "cpu": "Healthy",
+          "memory": "Healthy",
+          "disk": "Healthy"
+        },
+        "os": {
+          "image": "quay.io/solar-farms/ai-inverter:1.5.0"
+        },
+        "systemInfo": {
+          "hostname": "west-device-1",
+          "operatingSystem": "linux",
+          "agentVersion": "0.8.0",
+          "architecture": "amd64",
+          "distroName": "Red Hat Enterprise Linux",
+          "distroVersion": "9.6"
+        },
+        "systemd": []
       }
     }
   ]
