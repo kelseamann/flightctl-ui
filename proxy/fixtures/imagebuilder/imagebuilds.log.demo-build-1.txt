@@ -1,0 +1,7 @@
+[2024-04-10T12:00:05Z] Starting image build demo-build-1
+[2024-04-10T12:00:06Z] Resolving source image example/base:1.0 from oci-registry
+[2024-04-10T12:05:12Z] Applying kickstart configuration
+[2024-04-10T12:18:44Z] Building root filesystem (amd64)
+[2024-04-10T12:26:03Z] Generating SBOM
+[2024-04-10T12:28:17Z] Pushing quay.io/example/output:1.0
+[2024-04-10T12:30:00Z] Build completed successfully

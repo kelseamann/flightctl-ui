@@ -2,7 +2,9 @@ package mock
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -18,28 +20,55 @@ func NewImageBuilderHandler(store *Store) *ImageBuilderHandler {
 
 func (h *ImageBuilderHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	forward := mux.Vars(r)["forward"]
-	body, status, err := h.store.ResolveImageBuilderFixture(r.Method, forward)
-	if err != nil {
-		if status == http.StatusNotFound {
+	result := h.store.ResolveImageBuilder(r.Method, forward)
+	if result.Err != nil {
+		if result.Status == http.StatusNotFound {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNotFound)
 			_ = json.NewEncoder(w).Encode(map[string]string{
-				"message": "mock: " + err.Error(),
+				"message": "mock: " + result.Err.Error(),
 			})
 			return
 		}
-		if status == http.StatusMethodNotAllowed {
-			http.Error(w, err.Error(), status)
+		if result.Status == http.StatusMethodNotAllowed {
+			http.Error(w, result.Err.Error(), result.Status)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(status)
+		w.WriteHeader(result.Status)
 		_ = json.NewEncoder(w).Encode(map[string]string{
-			"message": err.Error(),
+			"message": result.Err.Error(),
 		})
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	_, _ = w.Write(body)
+
+	contentType := result.ContentType
+	if contentType == "" {
+		contentType = "application/json"
+	}
+	w.Header().Set("Content-Type", contentType)
+	w.WriteHeader(result.Status)
+
+	if result.ContentType == "text/event-stream" {
+		writeSSELogLines(w, result.Body)
+		return
+	}
+
+	_, _ = w.Write(result.Body)
+}
+
+func writeSSELogLines(w http.ResponseWriter, body []byte) {
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		_, _ = w.Write(body)
+		return
+	}
+
+	for _, line := range strings.Split(string(body), "\n") {
+		if line == "" {
+			continue
+		}
+		_, _ = fmt.Fprintf(w, "data: %s\n\n", line)
+		flusher.Flush()
+	}
 }

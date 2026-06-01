@@ -4,48 +4,87 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
 const imageBuilderFixturePrefix = "imagebuilder/"
 
+// ImageBuilderResult is the resolved mock response for an imagebuilder API path.
+type ImageBuilderResult struct {
+	Body        []byte
+	Status      int
+	Err         error
+	ContentType string // empty means application/json
+}
+
 // ResolveImageBuilderFixture returns JSON for /api/imagebuilder/{forward} paths.
 func (s *Store) ResolveImageBuilderFixture(method, forwardPath string) ([]byte, int, error) {
+	result := s.ResolveImageBuilder(method, forwardPath)
+	return result.Body, result.Status, result.Err
+}
+
+// ResolveImageBuilder returns a mock response for /api/imagebuilder/{forward} paths.
+func (s *Store) ResolveImageBuilder(method, forwardPath string) ImageBuilderResult {
 	forwardPath = strings.TrimPrefix(strings.TrimSpace(forwardPath), "/")
 	if forwardPath == "" {
-		return nil, http.StatusNotFound, fmt.Errorf("empty path")
+		return ImageBuilderResult{Status: http.StatusNotFound, Err: fmt.Errorf("empty path")}
 	}
 
 	pathOnly := forwardPath
+	query := ""
 	if idx := strings.Index(pathOnly, "?"); idx >= 0 {
+		query = pathOnly[idx+1:]
 		pathOnly = pathOnly[:idx]
+	}
+
+	follow := false
+	if query != "" {
+		if values, err := url.ParseQuery(query); err == nil {
+			follow = values.Get("follow") == "true"
+		}
 	}
 
 	switch method {
 	case http.MethodGet:
-		return s.resolveImageBuilderGet(pathOnly)
+		return s.resolveImageBuilderGet(pathOnly, follow)
 	case http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
-		return s.resolveMutation(method, pathOnly)
+		body, status, err := s.resolveMutation(method, pathOnly)
+		return ImageBuilderResult{Body: body, Status: status, Err: err}
 	default:
-		return nil, http.StatusMethodNotAllowed, fmt.Errorf("method %s not supported in mock mode", method)
+		return ImageBuilderResult{
+			Status: http.StatusMethodNotAllowed,
+			Err:    fmt.Errorf("method %s not supported in mock mode", method),
+		}
 	}
 }
 
-func (s *Store) resolveImageBuilderGet(pathOnly string) ([]byte, int, error) {
+func (s *Store) resolveImageBuilderGet(pathOnly string, follow bool) ImageBuilderResult {
+	if logPath, ok := parseImageBuilderLogPath(pathOnly); ok {
+		body, status, contentType, err := s.resolveImageBuilderLog(logPath.collection, logPath.name, follow)
+		return ImageBuilderResult{Body: body, Status: status, Err: err, ContentType: contentType}
+	}
 	switch pathOnly {
 	case "api/v1/imagebuilds":
-		return s.mustRead(imageBuilderFixturePrefix + "imagebuilds.list.json")
+		body, status, err := s.mustRead(imageBuilderFixturePrefix + "imagebuilds.list.json")
+		return ImageBuilderResult{Body: body, Status: status, Err: err}
 	case "api/v1/imagepromotions":
-		return s.mustRead(imageBuilderFixturePrefix + "imagepromotions.list.json")
+		body, status, err := s.mustRead(imageBuilderFixturePrefix + "imagepromotions.list.json")
+		return ImageBuilderResult{Body: body, Status: status, Err: err}
 	case "api/v1/imageexports":
-		return s.mustRead(imageBuilderFixturePrefix + "imageexports.list.json")
+		body, status, err := s.mustRead(imageBuilderFixturePrefix + "imageexports.list.json")
+		return ImageBuilderResult{Body: body, Status: status, Err: err}
 	}
 
 	if detail, ok := parseDetailPath(pathOnly); ok {
-		return s.resolveFixtureDetail(imageBuilderFixturePrefix, detail)
+		body, status, err := s.resolveFixtureDetail(imageBuilderFixturePrefix, detail)
+		return ImageBuilderResult{Body: body, Status: status, Err: err}
 	}
 
-	return nil, http.StatusNotFound, fmt.Errorf("no fixture for GET %s", pathOnly)
+	return ImageBuilderResult{
+		Status: http.StatusNotFound,
+		Err:    fmt.Errorf("no fixture for GET %s", pathOnly),
+	}
 }
 
 func (s *Store) resolveFixtureDetail(prefix string, d detailPath) ([]byte, int, error) {

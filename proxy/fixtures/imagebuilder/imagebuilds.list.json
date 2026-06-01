@@ -33,7 +33,7 @@
             "status": "True",
             "lastTransitionTime": "2024-04-10T12:30:00Z",
             "message": "Build completed successfully",
-            "reason": "BuildSucceeded"
+            "reason": "Completed"
           }
         ],
         "imageReference": "quay.io/example/output:1.0",
@@ -71,7 +71,7 @@
             "status": "False",
             "lastTransitionTime": "2024-04-11T09:15:00Z",
             "message": "Build in progress",
-            "reason": "BuildRunning"
+            "reason": "Building"
           }
         ]
       },
