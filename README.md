@@ -29,7 +29,8 @@ In mock dev mode, the masthead includes a **Branch** dropdown (`Branch: main`, `
 
 - **`main`** — default product UI
 - **`image-builds-column-fix`** — Image Builder table with unified status stepper and kebab actions ([EDM-4056](https://redhat.atlassian.net/browse/EDM-4056))
-- **`EDM-*`** — ticket-scoped UX branches as they are added
+- **`EDM-3710`** — Cockpit onsite onboarding (steps 1–4) and RHEM reporter journey (steps 5–8); preview at `/onsite-setup?branch=EDM-3710` ([EDM-3710](https://redhat.atlassian.net/browse/EDM-3710) — UX comments on this ticket, not EDM-3227)
+- **`EDM-*`** — other ticket-scoped UX branches as they are added
 
 The selection is stored in `sessionStorage` and reflected in the URL as `?branch=<id>` so you can bookmark or share a specific variant. Wireframes in Figma should use the matching Jira key as the page name where applicable.
 

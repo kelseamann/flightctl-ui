@@ -1,0 +1,7 @@
+.fctl-cockpit-onsite-setup-page {
+  --pf-v6-c-page--BackgroundColor: var(--pf-t--global--background--color--secondary--default);
+}
+
+.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard {
+  max-width: 48rem;
+}

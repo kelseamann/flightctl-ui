@@ -29,6 +29,7 @@ import DeviceTableToolbar from './DeviceTableToolbar';
 import EnrolledDeviceTableRow from './EnrolledDeviceTableRow';
 import { DeviceTextFilterKey, FilterSearchParams } from '../../../utils/status/devices';
 import { GlobalSystemRestoreBanners } from '../../SystemRestore/SystemRestoreBanners';
+import { useUxBranch } from '../../../hooks/useUxBranch';
 
 interface EnrolledDeviceTableProps {
   devices: Array<Device>;
@@ -51,7 +52,7 @@ interface EnrolledDeviceTableProps {
   // getSortParams: (columnIndex: number) => ThProps['sort'];
 }
 
-export const getDeviceTableColumns = (t: TFunction) => [
+export const getDeviceTableColumns = (t: TFunction, showFirstBootCustomization = false) => [
   {
     id: 'alias',
     name: t('Alias'),
@@ -64,6 +65,18 @@ export const getDeviceTableColumns = (t: TFunction) => [
     id: 'fleet',
     name: t('Fleet'),
   },
+  ...(showFirstBootCustomization
+    ? [
+        {
+          id: 'provisioning',
+          name: t('Provisioning'),
+        },
+        {
+          id: 'firstBootCustomization',
+          name: t('Onsite customization'),
+        },
+      ]
+    : []),
   {
     id: 'appStatus',
     name: t('Application status'),
@@ -108,10 +121,14 @@ const EnrolledDevicesTable = ({
 }: EnrolledDeviceTableProps) => {
   const { t } = useTranslation();
   const { put } = useFetch();
+  const { isFirstBootCustomizationBranch } = useUxBranch();
 
   const [addDeviceModal, setAddDeviceModal] = React.useState(false);
   const [isMassDecommissionModalOpen, setIsMassDecommissionModalOpen] = React.useState(false);
-  const deviceColumns = React.useMemo(() => getDeviceTableColumns(t), [t]);
+  const deviceColumns = React.useMemo(
+    () => getDeviceTableColumns(t, isFirstBootCustomizationBranch),
+    [isFirstBootCustomizationBranch, t],
+  );
 
   const { onRowSelect, hasSelectedRows, isAllSelected, isRowSelected, setAllSelected } = useTableSelect();
 

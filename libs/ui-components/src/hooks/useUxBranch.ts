@@ -8,16 +8,16 @@ export const UX_BRANCH_STORAGE_KEY = 'rhem-ux-branch';
 export const UX_BRANCH_MAIN = 'main';
 export const UX_BRANCH_COLUMN_FIX = 'image-builds-column-fix';
 
-export const UX_TICKET_BRANCHES = [
-  'EDM-3861',
-  'EDM-3863',
-  'EDM-3866',
-  'EDM-3864',
-  'EDM-3862',
-  'EDM-3867',
-  'EDM-3227',
-  'EDM-1471',
-] as const;
+/** Cockpit onsite onboarding + RHEM reporter UX — comment on this Jira, not EDM-3227 */
+export const UX_BRANCH_EDM_3710 = 'EDM-3710';
+export const UX_BRANCH_EDM_3710_JIRA = 'https://redhat.atlassian.net/browse/EDM-3710';
+
+/** @deprecated Alias; branch id is {@link UX_BRANCH_EDM_3710} */
+export const UX_BRANCH_FIRST_BOOT = UX_BRANCH_EDM_3710;
+
+const UX_BRANCH_LEGACY_EDM_3227 = 'EDM-3227';
+
+export const UX_TICKET_BRANCHES = [UX_BRANCH_EDM_3710, 'EDM-3863'] as const;
 
 export type UxTicketBranch = (typeof UX_TICKET_BRANCHES)[number];
 export type UxBranch = typeof UX_BRANCH_MAIN | typeof UX_BRANCH_COLUMN_FIX | UxTicketBranch;
@@ -26,13 +26,17 @@ const KNOWN_BRANCHES = new Set<string>([UX_BRANCH_MAIN, UX_BRANCH_COLUMN_FIX, ..
 
 export const UX_BRANCH_OPTIONS: ReadonlyArray<{ id: UxBranch; label: string }> = [
   { id: UX_BRANCH_MAIN, label: UX_BRANCH_MAIN },
+  { id: UX_BRANCH_EDM_3710, label: UX_BRANCH_EDM_3710 },
+  { id: 'EDM-3863', label: 'EDM-3863' },
   { id: UX_BRANCH_COLUMN_FIX, label: UX_BRANCH_COLUMN_FIX },
-  ...UX_TICKET_BRANCHES.map((id) => ({ id, label: id })),
 ];
 
 const parseUxBranch = (value: string | null): UxBranch => {
   if (!value || value === UX_BRANCH_MAIN) {
     return UX_BRANCH_MAIN;
+  }
+  if (value === UX_BRANCH_LEGACY_EDM_3227) {
+    return UX_BRANCH_EDM_3710;
   }
   if (KNOWN_BRANCHES.has(value)) {
     return value as UxBranch;
@@ -103,5 +107,7 @@ export const useUxBranch = () => {
     branch,
     setBranch,
     isColumnFixBranch: branch === UX_BRANCH_COLUMN_FIX,
+    isFirstBootCustomizationBranch: branch === UX_BRANCH_EDM_3710,
+    edm3710JiraUrl: UX_BRANCH_EDM_3710_JIRA,
   };
 };

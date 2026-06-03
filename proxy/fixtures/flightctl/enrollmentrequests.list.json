@@ -12,7 +12,32 @@
         "name": "a021622d8633782719874da4052f957faa742fc7050026748bc79065c8819d139"
       },
       "spec": {
-        "csr": "-----BEGIN CERTIFICATE-----\nCERTIFICATE CONTENT\n-----END CERTIFICATE-----\n"
+        "csr": "-----BEGIN CERTIFICATE-----\nCERTIFICATE CONTENT\n-----END CERTIFICATE-----\n",
+        "labels": {
+          "alias": "onsite-pending-east",
+          "flightctl.io/provisioning": "cockpit",
+          "flightctl.io/first-boot-customization": "awaiting"
+        }
+      },
+      "status": {
+        "conditions": []
+      }
+    },
+    {
+      "apiVersion": "v1beta1",
+      "kind": "EnrollmentRequest",
+      "metadata": {
+        "creationTimestamp": "2024-04-10T12:05:00Z",
+        "labels": {},
+        "name": "b031733e9744893820985eb5163g068gbb853fc8161137859cd90176d9920e240"
+      },
+      "spec": {
+        "csr": "-----BEGIN CERTIFICATE-----\nCERTIFICATE CONTENT\n-----END CERTIFICATE-----\n",
+        "labels": {
+          "alias": "onsite-active-west",
+          "flightctl.io/provisioning": "cockpit",
+          "flightctl.io/first-boot-customization": "in-progress"
+        }
       },
       "status": {
         "conditions": []
@@ -27,29 +52,15 @@
         "name": "16dc6416fa77392a00aa653f6bc7f6591f7b2611853950cb40c56d54f31c128b"
       },
       "spec": {
-        "csr": "-----BEGIN CERTIFICATE-----\nCERTIFICATE CONTENT\n-----END CERTIFICATE-----\n"
+        "csr": "-----BEGIN CERTIFICATE-----\nCERTIFICATE CONTENT\n-----END CERTIFICATE-----\n",
+        "labels": {
+          "alias": "onsite-ready-approve",
+          "flightctl.io/provisioning": "cockpit",
+          "flightctl.io/first-boot-customization": "complete"
+        }
       },
       "status": {
-        "approval": {
-          "approved": true,
-          "approvedAt": "2024-04-10T12:13:45Z",
-          "approvedBy": "unknown",
-          "labels": {
-            "alias": "east-device",
-            "fleet": "eu-east-prod-001",
-            "region": "spain"
-          }
-        },
-        "certificate": "-----BEGIN CERTIFICATE-----\nCERTIFICATE CONTENT\n-----END CERTIFICATE-----\n",
-        "conditions": [
-          {
-            "lastTransitionTime": "2024-04-10T12:13:45Z",
-            "message": "Approved by unknown",
-            "reason": "ManuallyApproved",
-            "status": "True",
-            "type": "Approved"
-          }
-        ]
+        "conditions": []
       }
     }
   ]

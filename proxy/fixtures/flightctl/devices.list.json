@@ -10,7 +10,9 @@
         "creationTimestamp": "2024-04-10T14:00:00Z",
         "labels": {
           "fleet": "eu-east-prod-001",
-          "alias": "east-device-1"
+          "alias": "east-device-1",
+          "flightctl.io/provisioning": "cockpit",
+          "flightctl.io/first-boot-customization": "complete"
         },
         "name": "device-east-001"
       },
@@ -68,7 +70,9 @@
         "creationTimestamp": "2024-04-10T15:00:00Z",
         "labels": {
           "fleet": "eu-west-prod-001",
-          "alias": "west-device-1"
+          "alias": "west-device-1",
+          "flightctl.io/provisioning": "cockpit",
+          "flightctl.io/first-boot-customization": "awaiting"
         },
         "name": "device-west-001"
       },

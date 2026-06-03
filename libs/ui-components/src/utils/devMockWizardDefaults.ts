@@ -9,6 +9,18 @@ import {
 } from '../components/Catalog/AddCatalogItemWizard/utils';
 import { ImageBuildFormValues } from '../components/ImageBuilds/CreateImageBuildWizard/types';
 import { getInitialValues as getImageBuildInitialValues } from '../components/ImageBuilds/CreateImageBuildWizard/utils';
+import {
+  CockpitOnsiteSetupValues,
+  defaultCockpitOnsiteSetupValues,
+} from '../components/CockpitOnsiteSetup/types';
+
+export const getDevMockCockpitOnsiteSetupInitialValues = (): CockpitOnsiteSetupValues => ({
+  ...defaultCockpitOnsiteSetupValues,
+  hostname: 'edge-node-01.example.com',
+  networkInterface: 'eth0',
+  flightControlEndpoint: 'https://flightctl.example.com',
+  flightControlToken: 'mock-setup-token',
+});
 
 export const getDevMockImageBuildInitialValues = (): ImageBuildFormValues => ({
   ...getImageBuildInitialValues(),

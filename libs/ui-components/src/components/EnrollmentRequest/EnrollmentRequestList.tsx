@@ -22,19 +22,30 @@ import { usePermissionsContext } from '../common/PermissionsContext';
 import ResourceListEmptyState from '../common/ResourceListEmptyState';
 import { usePendingEnrollments } from './useEnrollmentRequests';
 import TablePagination from '../Table/TablePagination';
+import { useUxBranch } from '../../hooks/useUxBranch';
 
 const EnrollmentRequestEmptyState = () => {
   const { t } = useTranslation();
   return <ResourceListEmptyState icon={MicrochipIcon} titleText={t('No enrollment requests here!')} />;
 };
 
-const getEnrollmentColumns = (t: TFunction) => [
+const getEnrollmentColumns = (t: TFunction, showFirstBootCustomization: boolean) => [
   {
     name: t('Alias'),
   },
   {
     name: t('Name'),
   },
+  ...(showFirstBootCustomization
+    ? [
+        {
+          name: t('Provisioning'),
+        },
+        {
+          name: t('Onsite customization'),
+        },
+      ]
+    : []),
   {
     name: t('Created'),
   },
@@ -52,12 +63,16 @@ const enrollmentRequestListPermissions = [
 
 const EnrollmentRequestList = ({ refetchDevices, isStandalone }: EnrollmentRequestListProps) => {
   const { t } = useTranslation();
+  const { isFirstBootCustomizationBranch } = useUxBranch();
   const { checkPermissions } = usePermissionsContext();
   const [canApprove, canDelete] = checkPermissions(enrollmentRequestListPermissions);
   const { remove } = useFetch();
   const [search, setSearch] = React.useState<string>('');
 
-  const enrollmentColumns = React.useMemo(() => getEnrollmentColumns(t), [t]);
+  const enrollmentColumns = React.useMemo(
+    () => getEnrollmentColumns(t, isFirstBootCustomizationBranch),
+    [isFirstBootCustomizationBranch, t],
+  );
   const [pendingEnrollments, isLoading, error, refetch, pagination] = usePendingEnrollments(search);
   const itemCount = pendingEnrollments.length;
 
@@ -131,6 +146,7 @@ const EnrollmentRequestList = ({ refetchDevices, isStandalone }: EnrollmentReque
                 }}
                 canApprove={canApprove}
                 canDelete={canDelete}
+                showFirstBootCustomization={isFirstBootCustomizationBranch}
               />
             ))}
           </Tbody>

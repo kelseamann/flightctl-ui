@@ -29,6 +29,10 @@ import ApproveDeviceModal from '../../modals/ApproveDeviceModal/ApproveDeviceMod
 import DetailsPageCard from '../../DetailsPage/DetailsPageCard';
 import DetailsPageActions, { useDeleteAction } from '../../DetailsPage/DetailsPageActions';
 import EnrollmentRequestStatus from '../../Status/EnrollmentRequestStatus';
+import FirstBootCustomizationStatus from '../../Status/FirstBootCustomizationStatus';
+import { useUxBranch } from '../../../hooks/useUxBranch';
+import OnboardingJourneyOverviewCard from '../../FirstBootCustomization/OnboardingJourneyOverviewCard';
+import ProvisioningSourceLabel from '../../FirstBootCustomization/ProvisioningSourceLabel';
 import LabelWithHelperText from '../../common/WithHelperText';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { ROUTE, useNavigate } from '../../../hooks/useNavigate';
@@ -58,6 +62,7 @@ const EnrollmentRequestDetails = () => {
   const navigate = useNavigate();
   const { checkPermissions } = usePermissionsContext();
   const [canApprove, canDelete] = checkPermissions(enrollmentRequestDetailsPermissions);
+  const { isFirstBootCustomizationBranch } = useUxBranch();
 
   const [isApprovalModalOpen, setIsApprovalModalOpen] = React.useState(false);
   const erSystemInfo = useDeviceSpecSystemInfo(er?.spec.deviceStatus?.systemInfo, t);
@@ -99,6 +104,11 @@ const EnrollmentRequestDetails = () => {
       }
     >
       <Grid hasGutter>
+        {isFirstBootCustomizationBranch && er && (
+          <GridItem md={12}>
+            <OnboardingJourneyOverviewCard enrollmentRequest={er} />
+          </GridItem>
+        )}
         <GridItem md={12}>
           <DetailsPageCard>
             <CardTitle>{t('Details')}</CardTitle>
@@ -128,6 +138,22 @@ const EnrollmentRequestDetails = () => {
                     <EnrollmentRequestStatus er={er} />
                   </DescriptionListDescription>
                 </DescriptionListGroup>
+                {isFirstBootCustomizationBranch && er && (
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>{t('Provisioning method')}</DescriptionListTerm>
+                    <DescriptionListDescription>
+                      <ProvisioningSourceLabel />
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                )}
+                {isFirstBootCustomizationBranch && (
+                  <DescriptionListGroup>
+                    <DescriptionListTerm>{t('Onsite customization')}</DescriptionListTerm>
+                    <DescriptionListDescription>
+                      <FirstBootCustomizationStatus enrollmentRequest={er} />
+                    </DescriptionListDescription>
+                  </DescriptionListGroup>
+                )}
                 {erSystemInfo.baseInfo.map((systemInfo) => (
                   <DescriptionListGroup key={systemInfo.title}>
                     <DescriptionListTerm>{systemInfo.title}</DescriptionListTerm>

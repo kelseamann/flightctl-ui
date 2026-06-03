@@ -67,6 +67,9 @@ const SecurityOverviewPage = React.lazy(
 const PendingEnrollmentRequestsBadge = React.lazy(
   () => import('@flightctl/ui-components/src/components/EnrollmentRequest/PendingEnrollmentRequestsBadge'),
 );
+const CockpitOnsiteSetupPage = React.lazy(
+  () => import('@flightctl/ui-components/src/components/CockpitOnsiteSetup/CockpitOnsiteSetupPage'),
+);
 const CommandLineToolsPage = React.lazy(
   () => import('@flightctl/ui-components/src/components/Masthead/CommandLineToolsPage'),
 );
@@ -211,6 +214,15 @@ const getAppRoutes = (t: TFunction): ExtendedRouteObject[] => [
     path: '/enroll/:enrollmentRequestId',
     title: t('Enrollment Request'),
     element: <RedirectToEnrollmentDetails />,
+  },
+  {
+    path: '/onsite-setup',
+    title: t('System onboarding'),
+    element: (
+      <TitledRoute title={t('System onboarding')}>
+        <CockpitOnsiteSetupPage />
+      </TitledRoute>
+    ),
   },
   {
     path: '/devicemanagement/fleets',
