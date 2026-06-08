@@ -2,5 +2,9 @@ import { getDevMockCockpitOnsiteSetupInitialValues } from '../../utils/devMockWi
 import { isDevMockApi } from '../../utils/devMock';
 import { CockpitOnsiteSetupValues, defaultCockpitOnsiteSetupValues } from './types';
 
-export const getCockpitOnsiteSetupInitialValues = (): CockpitOnsiteSetupValues =>
-  isDevMockApi() ? getDevMockCockpitOnsiteSetupInitialValues() : { ...defaultCockpitOnsiteSetupValues };
+export const getCockpitOnsiteSetupInitialValues = (): CockpitOnsiteSetupValues => {
+  if (isDevMockApi()) {
+    return getDevMockCockpitOnsiteSetupInitialValues();
+  }
+  return { ...defaultCockpitOnsiteSetupValues };
+};

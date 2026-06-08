@@ -11,29 +11,19 @@ import {
 
 import { useTranslation } from '../../hooks/useTranslation';
 import { isDevMockApi } from '../../utils/devMock';
-import {
-  COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER,
-  COCKPIT_ONSITE_SETUP_PROGRESS_STEP,
-} from './cockpitOnsiteSetupConstants';
-import { CockpitOnsiteSetupValues } from './types';
+import { COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER } from './cockpitOnsiteSetupConstants';
 
 const STEP_ORDER = COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER;
 
 type CockpitOnsiteSetupWizardFooterProps = {
-  values: CockpitOnsiteSetupValues;
   isStepValid: (stepId: string) => boolean;
-  progressComplete: boolean;
-  onApply: () => void;
-  onFinish: () => void;
+  onStartEnrollment: () => void;
   onCancel: () => void;
 };
 
 const CockpitOnsiteSetupWizardFooter = ({
-  values,
   isStepValid,
-  progressComplete,
-  onApply,
-  onFinish,
+  onStartEnrollment,
   onCancel,
 }: CockpitOnsiteSetupWizardFooterProps) => {
   const { t } = useTranslation();
@@ -42,40 +32,32 @@ const CockpitOnsiteSetupWizardFooter = ({
   const stepIndex = STEP_ORDER.indexOf(stepId as (typeof STEP_ORDER)[number]);
   const isFirst = stepIndex === 0;
   const isReview = stepId === 'review';
-  const isProgress = stepId === COCKPIT_ONSITE_SETUP_PROGRESS_STEP;
+  const isConfirmation = stepId === 'confirmation';
   const canAdvance = isDevMockApi() || isStepValid(stepId);
 
-  const primaryLabel = isProgress
-    ? t('Finish')
-    : isReview
-      ? values.flightControlEnabled || values.insightsEnabled
-        ? t('Apply and enroll')
-        : t('Apply')
-      : t('Next');
+  if (isConfirmation) {
+    return null;
+  }
+
+  const primaryLabel = isReview ? t('Start Enrollment') : t('Next step');
 
   const onPrimary = () => {
-    if (isProgress) {
-      onFinish();
-      return;
-    }
     if (isReview) {
-      onApply();
-      goToStepById(COCKPIT_ONSITE_SETUP_PROGRESS_STEP);
+      onStartEnrollment();
+      goToStepById('confirmation');
       return;
     }
     goToNextStep();
   };
 
-  const primaryDisabled = isProgress
-    ? !isDevMockApi() && !progressComplete
-    : !isReview && !canAdvance;
+  const primaryDisabled = !isReview && !canAdvance;
 
   return (
     <WizardFooterWrapper>
       <ActionList style={{ justifyContent: 'normal' }}>
         <ActionListGroup>
           <ActionListItem>
-            <Button variant="secondary" onClick={goToPrevStep} isDisabled={isFirst || isProgress}>
+            <Button variant="secondary" onClick={goToPrevStep} isDisabled={isFirst}>
               {t('Back')}
             </Button>
           </ActionListItem>
@@ -87,7 +69,7 @@ const CockpitOnsiteSetupWizardFooter = ({
         </ActionListGroup>
         <ActionListGroup>
           <ActionListItem>
-            <Button variant="link" onClick={onCancel} isDisabled={isProgress && !progressComplete && !isDevMockApi()}>
+            <Button variant="link" onClick={onCancel}>
               {t('Cancel')}
             </Button>
           </ActionListItem>

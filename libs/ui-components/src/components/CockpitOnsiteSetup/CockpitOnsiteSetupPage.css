@@ -5,3 +5,11 @@
 .fctl-cockpit-onsite-setup-page .pf-v6-c-wizard {
   max-width: 48rem;
 }
+
+.fctl-cockpit-network-detected > .pf-v6-l-stack__item + .pf-v6-l-stack__item {
+  margin-block-start: var(--pf-t--global--spacer--sm);
+}
+
+.fctl-cockpit-network-detected .pf-v6-c-card__body {
+  padding-block-start: 0;
+}

@@ -5,7 +5,9 @@ import { Navigate } from 'react-router-dom';
 
 import { useTranslation } from '../../hooks/useTranslation';
 import { UX_BRANCH_EDM_3710_JIRA, useUxBranch } from '../../hooks/useUxBranch';
+import CockpitOnsiteSetupCompleteSplash from './CockpitOnsiteSetupCompleteSplash';
 import CockpitOnsiteSetupWizard from './CockpitOnsiteSetupWizard';
+import { CockpitOnsiteSetupValues } from './types';
 
 import './CockpitOnsiteSetupPage.css';
 
@@ -13,38 +15,51 @@ const CockpitOnsiteSetupPage = () => {
   const { t } = useTranslation();
   const { isFirstBootCustomizationBranch } = useUxBranch();
   const [dismissed, setDismissed] = React.useState(false);
+  const [completedValues, setCompletedValues] = React.useState<CockpitOnsiteSetupValues | null>(null);
 
   if (!isFirstBootCustomizationBranch) {
     return <Navigate to="/devicemanagement/devices" replace />;
   }
 
   if (dismissed) {
-    return <Navigate to="/devicemanagement/devices" replace />;
+    return <Navigate to="/devicemanagement/enrollmentrequests" replace />;
   }
 
   return (
     <Page className="fctl-cockpit-onsite-setup-page">
       <PageSection variant="secondary" isWidthLimited>
-        <Content component={ContentVariants.p} className="pf-v6-u-mb-md pf-v6-u-color-200">
-          {t(
-            'UX prototype of Cockpit system onboarding (steps 1–4). Use a phone or laptop browser on the device network. RHEM reports status from step 5 onward.',
-          )}
-        </Content>
-        <Content component={ContentVariants.p} className="pf-v6-u-mb-lg">
-          <Button
-            component="a"
-            variant="link"
-            isInline
-            href={UX_BRANCH_EDM_3710_JIRA}
-            target="_blank"
-            rel="noopener noreferrer"
-            icon={<ExternalLinkAltIcon />}
-            iconPosition="end"
-          >
-            {t('EDM-3710 — track UX feedback in Jira')}
-          </Button>
-        </Content>
-        <CockpitOnsiteSetupWizard onComplete={() => setDismissed(true)} />
+        {!completedValues ? (
+          <>
+            <Content component={ContentVariants.p} className="pf-v6-u-mb-md pf-v6-u-color-200">
+              {t(
+                'UX prototype aligned to the device onboarding wizard spec. Runs under Cockpit on the device; RHEM reports enrollment from step 5 of the full journey.',
+              )}
+            </Content>
+            <Content component={ContentVariants.p} className="pf-v6-u-mb-lg">
+              <Button
+                component="a"
+                variant="link"
+                isInline
+                href={UX_BRANCH_EDM_3710_JIRA}
+                target="_blank"
+                rel="noopener noreferrer"
+                icon={<ExternalLinkAltIcon />}
+                iconPosition="end"
+              >
+                {t('EDM-3710 — leave UX feedback in Jira')}
+              </Button>
+            </Content>
+            <CockpitOnsiteSetupWizard
+              onCancel={() => setDismissed(true)}
+              onEnrollmentSuccess={setCompletedValues}
+            />
+          </>
+        ) : (
+          <CockpitOnsiteSetupCompleteSplash
+            flightControlUrl={completedValues.flightControlEndpoint}
+            onDismiss={() => setDismissed(true)}
+          />
+        )}
       </PageSection>
     </Page>
   );
