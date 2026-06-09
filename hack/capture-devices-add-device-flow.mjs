@@ -38,12 +38,12 @@ async function capturePage(page, captureId) {
   await expandForCapture(page);
   await ensureCaptureScript(page);
   await page.waitForTimeout(1500);
-  page.evaluate(
+  void page.evaluate(
     ({ captureId, endpoint }) => window.figma.captureForDesign({ captureId, endpoint, selector: 'body' }),
     { captureId, endpoint },
   );
   console.log(`Submitted ${captureId}`);
-  await page.waitForTimeout(8000);
+  await page.waitForTimeout(5000);
 }
 
 async function withPage(run) {
@@ -51,7 +51,10 @@ async function withPage(run) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   try {
     await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.evaluate(() => localStorage.setItem('flightctl-current-organization', 'default'));
+    await page.evaluate(() => {
+      localStorage.setItem('flightctl-current-organization', 'default');
+      sessionStorage.setItem('rhem-ux-branch', 'EDM-3710');
+    });
     await page.goto(DEVICES_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.getByRole('heading', { name: 'Devices' }).first().waitFor({ timeout: 60000 });
     return await run(page);

@@ -232,14 +232,14 @@ async function capturePage(page, captureId, label, captureHeight = 900) {
   await prepareMacViewport(page, captureHeight);
   await ensureCaptureScript(page);
   await page.waitForTimeout(1200);
-  page.evaluate(
+  void page.evaluate(
     ({ captureId, endpoint, selector }) => {
       window.figma.captureForDesign({ captureId, endpoint, selector });
     },
     { captureId, endpoint, selector: `#${CAPTURE_ROOT_ID}` },
   );
   console.log(`  submitted ${label}`);
-  await page.waitForTimeout(8000);
+  await page.waitForTimeout(5000);
 }
 
 async function goToWizardStep(page, stepName) {
