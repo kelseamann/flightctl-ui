@@ -27,7 +27,7 @@ async function capturePage(page, captureId) {
     { captureId, endpoint },
   );
   console.log(`Captured ${captureId}:`, result);
-  await page.waitForTimeout(8000);
+  await page.waitForTimeout(5000);
   return result;
 }
 
@@ -52,12 +52,24 @@ if (mode === 'modal' || mode === 'both') {
     await page.getByRole('button', { name: 'Add devices' }).first().click();
     await page.getByRole('dialog').waitFor({ timeout: 30000 });
     await page.getByText('Cockpit on the device', { exact: true }).waitFor({ timeout: 30000 });
+    await page.getByRole('button', { name: 'Open device onboarding' }).first().waitFor({ timeout: 30000 });
     await capturePage(page, captures.addDeviceModal);
   });
 }
 
 if (mode === 'pending' || mode === 'both') {
   await withPage(async (page) => {
+    await page.evaluate(async () => {
+      await fetch('/api/flightctl/api/v1/enrollmentrequests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-FlightCtl-Organization-ID': 'default',
+        },
+        body: '{}',
+      });
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.getByRole('heading', { name: 'Devices pending approval' }).waitFor({ timeout: 30000 });
     await page.getByText('warehouse-edge-07').waitFor({ timeout: 30000 });
     await capturePage(page, captures.pendingApproval);

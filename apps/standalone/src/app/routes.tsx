@@ -216,15 +216,6 @@ const getAppRoutes = (t: TFunction): ExtendedRouteObject[] => [
     element: <RedirectToEnrollmentDetails />,
   },
   {
-    path: '/onsite-setup',
-    title: t('System onboarding'),
-    element: (
-      <TitledRoute title={t('System onboarding')}>
-        <CockpitOnsiteSetupPage />
-      </TitledRoute>
-    ),
-  },
-  {
     path: '/devicemanagement/fleets',
     title: t('Fleets'),
     showInNav: true,
@@ -586,6 +577,20 @@ const AppRouter = () => {
     {
       path: '/callback',
       element: <Navigate to="/" replace />,
+    },
+    {
+      path: '/onsite-setup',
+      element: (
+        <React.Suspense
+          fallback={
+            <Bullseye>
+              <Spinner />
+            </Bullseye>
+          }
+        >
+          <CockpitOnsiteSetupPage />
+        </React.Suspense>
+      ),
     },
     {
       path: '/',

@@ -8,9 +8,6 @@ import { ListAction } from '../ListPage/types';
 import { useTranslation } from '../../hooks/useTranslation';
 import { ROUTE } from '../../hooks/useNavigate';
 import ResourceLink from '../common/ResourceLink';
-import ProvisioningSourceLabel from '../FirstBootCustomization/ProvisioningSourceLabel';
-import FirstBootCustomizationStatus from '../Status/FirstBootCustomizationStatus';
-
 type EnrollmentRequestTableRow = {
   rowIndex: number;
   onRowSelect: (er: EnrollmentRequest) => OnSelect;
@@ -20,7 +17,6 @@ type EnrollmentRequestTableRow = {
   deleteAction: ListAction;
   canApprove: boolean;
   canDelete: boolean;
-  showFirstBootCustomization?: boolean;
 };
 
 const EnrollmentRequestTableRow: React.FC<EnrollmentRequestTableRow> = ({
@@ -32,7 +28,6 @@ const EnrollmentRequestTableRow: React.FC<EnrollmentRequestTableRow> = ({
   onApprove,
   canApprove,
   canDelete,
-  showFirstBootCustomization,
 }) => {
   const { t } = useTranslation();
   const erName = er.metadata.name as string;
@@ -68,16 +63,6 @@ const EnrollmentRequestTableRow: React.FC<EnrollmentRequestTableRow> = ({
       <Td dataLabel={t('Name')}>
         <ResourceLink id={erName} />
       </Td>
-      {showFirstBootCustomization && (
-        <Td dataLabel={t('Provisioning')}>
-          <ProvisioningSourceLabel />
-        </Td>
-      )}
-      {showFirstBootCustomization && (
-        <Td dataLabel={t('Onsite customization')}>
-          <FirstBootCustomizationStatus enrollmentRequest={er} />
-        </Td>
-      )}
       <Td dataLabel={t('Created')}>{timeSinceText(t, er.metadata.creationTimestamp)}</Td>
       {canApprove && (
         <Td dataLabel={t('Approve')}>

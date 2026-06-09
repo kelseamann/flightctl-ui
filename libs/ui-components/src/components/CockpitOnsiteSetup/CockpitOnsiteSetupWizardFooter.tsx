@@ -8,22 +8,28 @@ import {
   WizardFooterWrapper,
   useWizardContext,
 } from '@patternfly/react-core';
+import ArrowRightIcon from '@patternfly/react-icons/dist/js/icons/arrow-right-icon';
 
 import { useTranslation } from '../../hooks/useTranslation';
 import { isDevMockApi } from '../../utils/devMock';
 import { COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER } from './cockpitOnsiteSetupConstants';
+import type { EnrollmentOutcome } from './types';
 
 const STEP_ORDER = COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER;
 
 type CockpitOnsiteSetupWizardFooterProps = {
   isStepValid: (stepId: string) => boolean;
+  enrollmentOutcome: EnrollmentOutcome;
   onStartEnrollment: () => void;
+  onFinishEnrollment: () => void;
   onCancel: () => void;
 };
 
 const CockpitOnsiteSetupWizardFooter = ({
   isStepValid,
+  enrollmentOutcome,
   onStartEnrollment,
+  onFinishEnrollment,
   onCancel,
 }: CockpitOnsiteSetupWizardFooterProps) => {
   const { t } = useTranslation();
@@ -34,6 +40,29 @@ const CockpitOnsiteSetupWizardFooter = ({
   const isReview = stepId === 'review';
   const isConfirmation = stepId === 'confirmation';
   const canAdvance = isDevMockApi() || isStepValid(stepId);
+
+  if (isConfirmation && enrollmentOutcome === 'success') {
+    return (
+      <WizardFooterWrapper>
+        <ActionList style={{ justifyContent: 'normal' }}>
+          <ActionListGroup>
+            <ActionListItem>
+              <Button
+                variant="primary"
+                size="lg"
+                icon={<ArrowRightIcon />}
+                iconPosition="end"
+                onClick={onFinishEnrollment}
+                data-testid="wizard-return-to-devices-button"
+              >
+                {t('Go to Devices pending approval')}
+              </Button>
+            </ActionListItem>
+          </ActionListGroup>
+        </ActionList>
+      </WizardFooterWrapper>
+    );
+  }
 
   if (isConfirmation) {
     return null;

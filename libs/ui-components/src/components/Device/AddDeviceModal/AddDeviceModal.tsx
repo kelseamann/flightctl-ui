@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   Button,
+  Divider,
   List,
   ListComponent,
   ListItem,
@@ -11,17 +12,25 @@ import {
   OrderType,
   Stack,
   StackItem,
+  Title,
 } from '@patternfly/react-core';
+import ExternalLinkAltIcon from '@patternfly/react-icons/dist/js/icons/external-link-alt-icon';
 
 import { useTranslation } from '../../../hooks/useTranslation';
 import LearnMoreLink from '../../common/LearnMoreLink';
 import { useAppLinks } from '../../../hooks/useAppLinks';
-import { useUxBranch } from '../../../hooks/useUxBranch';
+import { UX_BRANCH_EDM_3710, UX_BRANCH_PARAM, useUxBranch } from '../../../hooks/useUxBranch';
+
+const getOnsiteSetupUrl = (): string => {
+  const params = new URLSearchParams({ [UX_BRANCH_PARAM]: UX_BRANCH_EDM_3710 });
+  return `${window.location.origin}/onsite-setup?${params.toString()}`;
+};
 
 const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
   const { t } = useTranslation();
   const { isFirstBootCustomizationBranch } = useUxBranch();
   const addNewDevicesLink = useAppLinks('addNewDevice');
+  const onsiteSetupUrl = React.useMemo(() => getOnsiteSetupUrl(), []);
 
   const legacySteps = [
     t('Request an enrollment certificate for your device'),
@@ -29,6 +38,11 @@ const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
     t('Create, sign and publish a bootable OS disk image'),
     t('Boot your device into the OS disk image'),
   ];
+
+  const openOnsiteSetup = () => {
+    window.open(onsiteSetupUrl, '_blank', 'noopener,noreferrer');
+    onClose();
+  };
 
   return (
     <Modal variant="small" onClose={onClose} isOpen>
@@ -53,6 +67,32 @@ const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
                   'Ensure you have network access to Cockpit on the device before starting onboarding.',
                 )}
               </StackItem>
+              <StackItem>
+                <Button
+                  variant="link"
+                  isInline
+                  icon={<ExternalLinkAltIcon />}
+                  iconPosition="end"
+                  onClick={openOnsiteSetup}
+                >
+                  {t('Open device onboarding')}
+                </Button>
+              </StackItem>
+              <StackItem>
+                <Divider />
+              </StackItem>
+              <StackItem>
+                <Title headingLevel="h4" size="md">
+                  {t('Or add devices using an OS image:')}
+                </Title>
+              </StackItem>
+              <StackItem>
+                <List component={ListComponent.ol} type={OrderType.number}>
+                  {legacySteps.map((step) => (
+                    <ListItem key={step}>{step}</ListItem>
+                  ))}
+                </List>
+              </StackItem>
             </>
           ) : (
             <>
@@ -72,9 +112,14 @@ const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
         </Stack>
       </ModalBody>
       <ModalFooter>
-        <Button variant="primary" isInline onClick={onClose}>
+        <Button variant="link" onClick={onClose}>
           {t('Close')}
         </Button>
+        {isFirstBootCustomizationBranch && (
+          <Button variant="primary" icon={<ExternalLinkAltIcon />} iconPosition="end" onClick={openOnsiteSetup}>
+            {t('Open device onboarding')}
+          </Button>
+        )}
       </ModalFooter>
     </Modal>
   );

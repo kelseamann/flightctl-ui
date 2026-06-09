@@ -4,81 +4,95 @@ const BASE = 'http://localhost:9000';
 const WIZARD_URL = `${BASE}/onsite-setup?branch=EDM-3710`;
 const CAPTURE_SCRIPT = 'https://mcp.figma.com/mcp/html-to-design/capture.js';
 
-const captures = {
-  entry: 'c61782b1-422f-4f68-bc48-39bbc326a381',
-  general: '62f644c5-b951-4b7a-a842-42309324f1c2',
-  network: 'd442ee44-74af-40bf-9671-7be357352c79',
-  enrollment: 'faf40323-54eb-4cb4-92bd-fc6aaacd00a7',
-  review: '88484764-dff2-40d0-8aa4-b0d68f28e4c2',
-  confirmationEnrolling: 'e963515f-4daf-47c4-8da0-dd4a9cb8dcd6',
-  confirmationSuccess: '7efd6c96-4985-43c2-9930-cd651b2206c7',
-};
+const START_INDEX = Number(process.argv[2] || 0);
+const CAPTURE_IDS = process.argv.slice(3).filter(Boolean);
+
+const ALL_STEPS = [
+  { label: '01 — Onboarding entry', prepare: async (page) => {
+    await page.getByText("Let's begin onboarding your device").first().waitFor({ timeout: 30000 });
+    await page.getByText('Device Onboarding').first().waitFor({ timeout: 30000 });
+  }},
+  { label: '02 — General information', prepare: async (page) => {
+    await clickNextStep(page);
+    await page.getByRole('heading', { name: 'General information' }).waitFor({ timeout: 15000 });
+    await page.getByLabel('Host name').waitFor({ timeout: 15000 });
+  }},
+  { label: '03 — Network configurations', prepare: async (page) => {
+    await goToWizardStep(page, 'Network configurations');
+    await page.getByRole('heading', { name: 'Network configurations' }).waitFor({ timeout: 15000 });
+    await page.getByText('System detected').waitFor({ timeout: 15000 });
+    await page.getByLabel('Static IP').waitFor({ timeout: 15000 });
+  }},
+  { label: '04 — Service enrollment', prepare: async (page) => {
+    await goToWizardStep(page, 'Service enrollment');
+    await page.getByRole('heading', { name: 'Service enrollment' }).waitFor({ timeout: 15000 });
+    const endpoint = page.locator('#onsite-fc-url');
+    if (await endpoint.isVisible()) {
+      await endpoint.fill('https://flightctl.example.com');
+    }
+    await page.getByLabel('Token').waitFor({ timeout: 15000 });
+  }},
+  { label: '05 — Review and enroll', prepare: async (page) => {
+    await goToWizardStep(page, 'Review and enroll');
+    await page.getByRole('heading', { name: 'Review and enroll' }).waitFor({ timeout: 15000 });
+    await page.getByText('Device info').waitFor({ timeout: 15000 });
+  }},
+  { label: '06 — Confirmation (enrolling)', prepare: async (page) => {
+    await goToWizardStep(page, 'Service enrollment');
+    await page.locator('#onsite-fc-token').fill('mock-enrollment-token');
+    await goToWizardStep(page, 'Review and enroll');
+    await page.getByRole('heading', { name: 'Review and enroll' }).waitFor({ timeout: 15000 });
+    await page.getByTestId('wizard-next-button').click();
+    await page.waitForTimeout(1500);
+  }},
+];
+
+const STEP_CAPTURES = ALL_STEPS.slice(START_INDEX)
+  .map((step, index) => ({ ...step, id: CAPTURE_IDS[index] }))
+  .filter((step) => step.id);
 
 async function setupMockApi(page) {
   const organizations = {
     apiVersion: 'v1beta1',
     kind: 'OrganizationList',
     metadata: {},
-    items: [
-      {
-        apiVersion: 'v1beta1',
-        kind: 'Organization',
-        metadata: { name: 'default' },
-        spec: { displayName: 'Default Organization' },
-      },
-    ],
+    items: [{ apiVersion: 'v1beta1', kind: 'Organization', metadata: { name: 'default' }, spec: { displayName: 'Default Organization' } }],
   };
 
   await page.route('**/api/**', async (route) => {
     const url = route.request().url();
-
     if (url.includes('/api/login/info')) {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ username: 'Kelsea Mann UXD' }),
-      });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ username: 'Kelsea Mann UXD' }) });
       return;
     }
-
     if (url.includes('/auth/permissions')) {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({
-          permissions: [{ resource: '*', operations: ['*'] }],
-        }),
+        body: JSON.stringify({ permissions: [{ resource: '*', operations: ['*'] }] }),
       });
       return;
     }
-
     if (url.includes('/organizations')) {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(organizations),
-      });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(organizations) });
       return;
     }
-
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ items: [], metadata: {} }),
-    });
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], metadata: {} }) });
   });
 }
 
-async function bootstrapApp(page) {
+async function bootstrapPage(page) {
   await setupMockApi(page);
   await page.addInitScript(() => {
     window.DEV_MOCK_API = true;
+    window.__FIGMA_CAPTURE_SLOW_ENROLLMENT = true;
     const now = Math.floor(Date.now() / 1000);
     localStorage.setItem('flightctl-current-organization', 'default');
     localStorage.setItem('expiration', `${now + 3600}`);
     sessionStorage.setItem('rhem-ux-branch', 'EDM-3710');
   });
   await page.goto(BASE, { waitUntil: 'load', timeout: 60000 });
+  await page.goto(WIZARD_URL, { waitUntil: 'load', timeout: 60000 });
 }
 
 async function ensureCaptureScript(page) {
@@ -96,6 +110,7 @@ async function expandForCapture(page) {
         overflow: visible !important;
         max-height: none !important;
         height: auto !important;
+        max-width: none !important;
       }
     `,
   });
@@ -126,67 +141,28 @@ async function capturePage(page, captureId, label) {
     { captureId, endpoint },
   );
   console.log(`  submitted ${label}`);
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(5000);
 }
 
 async function goToWizardStep(page, stepName) {
   const nav = page.locator('.pf-v6-c-wizard__nav-link').filter({ hasText: stepName });
-  if (await nav.count()) {
-    await nav.first().click({ timeout: 15000 });
-    await page.waitForTimeout(600);
-    return;
-  }
-  throw new Error(`Wizard nav step not found: ${stepName}`);
-}
-
-async function clickNextStep(page) {
-  const next = page.getByRole('button', { name: 'Next step' });
-  await next.click({ timeout: 15000 });
+  await nav.first().click({ timeout: 15000 });
   await page.waitForTimeout(600);
 }
 
-async function main() {
+async function clickNextStep(page) {
+  await page.getByRole('button', { name: 'Next step' }).click({ timeout: 15000 });
+  await page.waitForTimeout(600);
+}
+
+for (const step of STEP_CAPTURES) {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-
   try {
-    await bootstrapApp(page);
-    await page.goto(WIZARD_URL, { waitUntil: 'load', timeout: 60000 });
-    await page.getByText("Let's begin onboarding your device").first().waitFor({ timeout: 30000 });
-
-    // Entry already captured in an earlier run.
-    await clickNextStep(page);
-    await page.getByRole('heading', { name: 'General information' }).waitFor({ timeout: 15000 });
-    await capturePage(page, captures.general, '02 — General information');
-
-    await goToWizardStep(page, 'Network configurations');
-    await page.getByRole('heading', { name: 'Network configurations' }).waitFor({ timeout: 15000 });
-    await capturePage(page, captures.network, '03 — Network configurations');
-
-    await goToWizardStep(page, 'Service enrollment');
-    await page.getByRole('heading', { name: 'Service enrollment' }).waitFor({ timeout: 15000 });
-    const endpoint = page.locator('#onsite-fc-url');
-    if (await endpoint.isVisible()) {
-      await endpoint.fill('https://flightctl.example.com');
-    }
-    await capturePage(page, captures.enrollment, '04 — Service enrollment');
-
-    await goToWizardStep(page, 'Review and enroll');
-    await page.getByRole('heading', { name: 'Review and enroll' }).waitFor({ timeout: 15000 });
-    await capturePage(page, captures.review, '05 — Review and enroll');
-
-    await page.getByRole('button', { name: 'Start Enrollment' }).click();
-    await page.getByText('Enrolling device').first().waitFor({ timeout: 15000 });
-    await capturePage(page, captures.confirmationEnrolling, '06 — Confirmation (enrolling)');
-
-    await page.getByText('Enrollment succeeded').first().waitFor({ timeout: 15000 });
-    await capturePage(page, captures.confirmationSuccess, '07 — Confirmation (success)');
+    await bootstrapPage(page);
+    await step.prepare(page);
+    await capturePage(page, step.id, step.label);
   } finally {
     await browser.close();
   }
 }
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});

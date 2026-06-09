@@ -1,6 +1,7 @@
 package mock
 
 import (
+	"encoding/json"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -64,5 +65,40 @@ func TestResolveFixtureNotFound(t *testing.T) {
 	_, status, err := store.ResolveFixture(http.MethodGet, "api/v1/unknown-resource")
 	if err == nil || status != http.StatusNotFound {
 		t.Fatalf("expected 404, got status=%d err=%v", status, err)
+	}
+}
+
+func TestEnrollmentRequestsMergePreservesMetadata(t *testing.T) {
+	log.InitLogs()
+	root := filepath.Join("..", "fixtures")
+	config.DevMockFixturesDir = root
+
+	store, err := NewStore()
+	if err != nil {
+		t.Fatalf("NewStore: %v", err)
+	}
+
+	_, status, err := store.ResolveFixture(http.MethodPost, "api/v1/enrollmentrequests")
+	if err != nil || status != http.StatusCreated {
+		t.Fatalf("POST enrollmentrequests: status=%d err=%v", status, err)
+	}
+
+	body, status, err := store.ResolveFixture(http.MethodGet, "api/v1/enrollmentrequests")
+	if err != nil || status != http.StatusOK {
+		t.Fatalf("GET enrollmentrequests: status=%d err=%v", status, err)
+	}
+
+	var parsed struct {
+		Metadata map[string]interface{} `json:"metadata"`
+		Items    []json.RawMessage      `json:"items"`
+	}
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if parsed.Metadata == nil {
+		t.Fatalf("merged enrollment list missing metadata")
+	}
+	if len(parsed.Items) < 4 {
+		t.Fatalf("expected at least 4 enrollment items, got %d", len(parsed.Items))
 	}
 }

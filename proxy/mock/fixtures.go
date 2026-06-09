@@ -13,8 +13,9 @@ import (
 
 // Store loads JSON fixture files from disk for dev mock mode.
 type Store struct {
-	root string
-	mu   sync.RWMutex
+	root                    string
+	mu                      sync.RWMutex
+	extraEnrollmentRequests []json.RawMessage
 }
 
 func NewStore() (*Store, error) {

@@ -1,65 +1,61 @@
 import * as React from 'react';
-import { Bullseye, Button, Content, ContentVariants, Page, PageSection, Spinner } from '@patternfly/react-core';
-import ExternalLinkAltIcon from '@patternfly/react-icons/dist/js/icons/external-link-alt-icon';
+import { Bullseye, Page, PageSection, Spinner } from '@patternfly/react-core';
 import { Navigate } from 'react-router-dom';
 
-import { useTranslation } from '../../hooks/useTranslation';
-import { UX_BRANCH_EDM_3710_JIRA, useUxBranch } from '../../hooks/useUxBranch';
-import CockpitOnsiteSetupCompleteSplash from './CockpitOnsiteSetupCompleteSplash';
+import { useFetch } from '../../hooks/useFetch';
+import { UX_BRANCH_EDM_3710, UX_BRANCH_PARAM, useUxBranch } from '../../hooks/useUxBranch';
+import { isDevMockApi } from '../../utils/devMock';
 import CockpitOnsiteSetupWizard from './CockpitOnsiteSetupWizard';
+import { getDevicesPendingApprovalUrl, returnToDevicesPendingApproval } from './cockpitOnsiteSetupReturn';
 import { CockpitOnsiteSetupValues } from './types';
 
 import './CockpitOnsiteSetupPage.css';
 
+const getDevicesUrl = (): string => {
+  const params = new URLSearchParams({ [UX_BRANCH_PARAM]: UX_BRANCH_EDM_3710 });
+  return `/devicemanagement/devices?${params.toString()}`;
+};
+
 const CockpitOnsiteSetupPage = () => {
-  const { t } = useTranslation();
   const { isFirstBootCustomizationBranch } = useUxBranch();
+  const { post } = useFetch();
   const [dismissed, setDismissed] = React.useState(false);
-  const [completedValues, setCompletedValues] = React.useState<CockpitOnsiteSetupValues | null>(null);
+
+  const handleDismiss = React.useCallback(() => {
+    setDismissed(true);
+  }, []);
+
+  const handleEnrollmentSuccess = React.useCallback(
+    async (_values: CockpitOnsiteSetupValues) => {
+      if (isDevMockApi()) {
+        try {
+          await post('enrollmentrequests', {});
+        } catch {
+          // Prototype flow still returns to Devices if mock POST fails.
+        }
+      }
+      returnToDevicesPendingApproval(getDevicesPendingApprovalUrl(), handleDismiss);
+    },
+    [handleDismiss, post],
+  );
 
   if (!isFirstBootCustomizationBranch) {
-    return <Navigate to="/devicemanagement/devices" replace />;
+    return <Navigate to={getDevicesUrl()} replace />;
   }
 
   if (dismissed) {
-    return <Navigate to="/devicemanagement/enrollmentrequests" replace />;
+    return <Navigate to={getDevicesUrl()} replace />;
   }
 
   return (
     <Page className="fctl-cockpit-onsite-setup-page">
-      <PageSection variant="secondary" isWidthLimited>
-        {!completedValues ? (
-          <>
-            <Content component={ContentVariants.p} className="pf-v6-u-mb-md pf-v6-u-color-200">
-              {t(
-                'UX prototype aligned to the device onboarding wizard spec. Runs under Cockpit on the device; RHEM reports enrollment from step 5 of the full journey.',
-              )}
-            </Content>
-            <Content component={ContentVariants.p} className="pf-v6-u-mb-lg">
-              <Button
-                component="a"
-                variant="link"
-                isInline
-                href={UX_BRANCH_EDM_3710_JIRA}
-                target="_blank"
-                rel="noopener noreferrer"
-                icon={<ExternalLinkAltIcon />}
-                iconPosition="end"
-              >
-                {t('EDM-3710 — leave UX feedback in Jira')}
-              </Button>
-            </Content>
-            <CockpitOnsiteSetupWizard
-              onCancel={() => setDismissed(true)}
-              onEnrollmentSuccess={setCompletedValues}
-            />
-          </>
-        ) : (
-          <CockpitOnsiteSetupCompleteSplash
-            flightControlUrl={completedValues.flightControlEndpoint}
-            onDismiss={() => setDismissed(true)}
-          />
-        )}
+      <PageSection
+        variant="secondary"
+        hasBodyWrapper={false}
+        type="wizard"
+        className="fctl-cockpit-onsite-setup-content"
+      >
+        <CockpitOnsiteSetupWizard onCancel={handleDismiss} onEnrollmentSuccess={handleEnrollmentSuccess} />
       </PageSection>
     </Page>
   );

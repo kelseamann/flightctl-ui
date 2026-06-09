@@ -2,8 +2,8 @@
   --pf-v6-c-page--BackgroundColor: var(--pf-t--global--background--color--secondary--default);
 }
 
-.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard {
-  max-width: 48rem;
+.fctl-cockpit-onsite-setup-page .fctl-cockpit-onsite-setup-content {
+  padding-block-start: var(--pf-t--global--spacer--2xl);
 }
 
 .fctl-cockpit-network-detected > .pf-v6-l-stack__item + .pf-v6-l-stack__item {

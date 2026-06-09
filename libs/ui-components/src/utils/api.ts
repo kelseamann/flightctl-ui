@@ -29,7 +29,7 @@ const getApiListCount = (listResponse: ApiList | undefined): number | undefined 
     return undefined;
   }
   const hasItems = listResponse.items.length > 0;
-  const extraItems = listResponse.metadata.remainingItemCount || 0;
+  const extraItems = listResponse.metadata?.remainingItemCount || 0;
   return hasItems ? 1 + extraItems : 0;
 };
 

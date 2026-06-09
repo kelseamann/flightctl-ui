@@ -15,7 +15,10 @@ type listItem struct {
 }
 
 type listEnvelope struct {
-	Items []json.RawMessage `json:"items"`
+	APIVersion string            `json:"apiVersion,omitempty"`
+	Kind       string            `json:"kind,omitempty"`
+	Metadata   json.RawMessage   `json:"metadata,omitempty"`
+	Items      []json.RawMessage `json:"items"`
 }
 
 // ResolveFixture returns JSON bytes for a Flight Control API forward path (e.g. api/v1/fleets).
@@ -79,7 +82,7 @@ func (s *Store) resolveGet(pathOnly string, fieldSelector string) ([]byte, int, 
 	case "api/v1/devices":
 		return s.mustRead("flightctl/devices.list.json")
 	case "api/v1/enrollmentrequests":
-		return s.mustRead("flightctl/enrollmentrequests.list.json")
+		return s.resolveEnrollmentRequestsList()
 	case "api/v1/catalogs":
 		return s.mustRead("flightctl/catalogs.list.json")
 	case "api/v1/catalogitems":
@@ -116,10 +119,56 @@ func parseDetailPath(pathOnly string) (detailPath, bool) {
 }
 
 func (s *Store) resolveMutation(method, pathOnly string) ([]byte, int, error) {
-	// Phase 1: accept mutations with empty object so forms do not hard-fail.
-	_ = method
-	_ = pathOnly
+	if method == http.MethodPost && pathOnly == "api/v1/enrollmentrequests" {
+		return s.appendPrototypeEnrollmentRequest()
+	}
+	// Phase 1: accept other mutations with empty object so forms do not hard-fail.
 	return []byte(`{}`), http.StatusOK, nil
+}
+
+func (s *Store) resolveEnrollmentRequestsList() ([]byte, int, error) {
+	base, status, err := s.mustRead("flightctl/enrollmentrequests.list.json")
+	if err != nil {
+		return nil, status, err
+	}
+
+	s.mu.RLock()
+	extra := append([]json.RawMessage(nil), s.extraEnrollmentRequests...)
+	s.mu.RUnlock()
+
+	if len(extra) == 0 {
+		return base, status, nil
+	}
+
+	var envelope listEnvelope
+	if err := json.Unmarshal(base, &envelope); err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	envelope.Items = append(extra, envelope.Items...)
+	merged, err := json.Marshal(envelope)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	return merged, status, nil
+}
+
+func (s *Store) appendPrototypeEnrollmentRequest() ([]byte, int, error) {
+	item, status, err := s.mustRead("flightctl/enrollmentrequests.warehouse-edge-07.json")
+	if err != nil {
+		return nil, status, err
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for _, existing := range s.extraEnrollmentRequests {
+		if strings.Contains(string(existing), "warehouse-edge-07") {
+			return item, http.StatusOK, nil
+		}
+	}
+
+	s.extraEnrollmentRequests = append([]json.RawMessage{item}, s.extraEnrollmentRequests...)
+	return item, http.StatusCreated, nil
 }
 
 func (s *Store) mustRead(relativePath string) ([]byte, int, error) {
