@@ -21,7 +21,7 @@ import CockpitOnsiteSetupEntryStep from './steps/CockpitOnsiteSetupEntryStep';
 import CockpitOnsiteSetupGeneralStep from './steps/CockpitOnsiteSetupGeneralStep';
 import CockpitOnsiteSetupNetworkStep from './steps/CockpitOnsiteSetupNetworkStep';
 import CockpitOnsiteSetupReviewStep from './steps/CockpitOnsiteSetupReviewStep';
-import { CockpitOnsiteSetupValues, EnrollmentOutcome } from './types';
+import { CockpitOnsiteSetupValues, EnrollmentFailureCode, EnrollmentOutcome } from './types';
 
 const NAV_STEP_ORDER = [...COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER];
 
@@ -35,6 +35,7 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
   const [values, setValues] = React.useState<CockpitOnsiteSetupValues>(() => getCockpitOnsiteSetupInitialValues());
   const [enrollmentOutcome, setEnrollmentOutcome] = React.useState<EnrollmentOutcome>('idle');
   const [deviceConnected, setDeviceConnected] = React.useState(false);
+  const [enrollmentFailureCode, setEnrollmentFailureCode] = React.useState<EnrollmentFailureCode | undefined>();
   const [hasStartedEnrollment, setHasStartedEnrollment] = React.useState(false);
 
   const updateValues = (patch: Partial<CockpitOnsiteSetupValues>) => {
@@ -87,12 +88,17 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
     setHasStartedEnrollment(true);
     setEnrollmentOutcome('running');
     setDeviceConnected(false);
+    setEnrollmentFailureCode(undefined);
   }, []);
 
-  const handleEnrollmentComplete = React.useCallback((success: boolean, connected: boolean) => {
-    setEnrollmentOutcome(success ? 'success' : 'failure');
-    setDeviceConnected(connected);
-  }, []);
+  const handleEnrollmentComplete = React.useCallback(
+    (success: boolean, connected: boolean, failureCode?: EnrollmentFailureCode) => {
+      setEnrollmentOutcome(success ? 'success' : 'failure');
+      setDeviceConnected(connected);
+      setEnrollmentFailureCode(failureCode);
+    },
+    [],
+  );
 
   const finishEnrollment = React.useCallback(() => {
     void onEnrollmentSuccess(values);
@@ -100,7 +106,7 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
 
   return (
     <Wizard
-      title={t('System onboarding')}
+      title={t('First-boot device onboarding')}
       onClose={onCancel}
       footer={
         <CockpitOnsiteSetupWizardFooter
@@ -157,6 +163,7 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
           {...stepProps}
           enrollmentOutcome={enrollmentOutcome}
           deviceConnected={deviceConnected}
+          enrollmentFailureCode={enrollmentFailureCode}
           onEnrollmentComplete={handleEnrollmentComplete}
         />
       </WizardStep>

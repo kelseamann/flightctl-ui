@@ -1,9 +1,11 @@
 import * as React from 'react';
 import {
+  Alert,
   Button,
   Card,
   CardBody,
   CardTitle,
+  Checkbox,
   DescriptionList,
   DescriptionListDescription,
   DescriptionListGroup,
@@ -54,7 +56,7 @@ const ReviewSection = ({ title, stepId, children }: ReviewSectionProps) => {
   );
 };
 
-const CockpitOnsiteSetupReviewStep = ({ values }: CockpitOnsiteSetupStepProps) => {
+const CockpitOnsiteSetupReviewStep = ({ values, onChange }: CockpitOnsiteSetupStepProps) => {
   const { t } = useTranslation();
   const configuredProxies = values.httpProxies.map((p) => p.trim()).filter(Boolean);
 
@@ -66,10 +68,28 @@ const CockpitOnsiteSetupReviewStep = ({ values }: CockpitOnsiteSetupStepProps) =
         </Title>
         <p className="pf-v6-u-color-200 pf-v6-u-mt-sm">
           {t(
-            'Confirm device, network, and enrollment settings. Cockpit will apply configuration on the device, then run enrollment scripts.',
+            'Confirm device, network, and enrollment settings before apply. Cockpit applies configuration on the device, then runs flightctl-agent enroll. Credentials and passwords are masked below.',
           )}
         </p>
       </StackItem>
+
+      {values.singleNicSetup && (
+        <StackItem>
+          <Alert variant="warning" isInline title={t('Browser connection will be severed')} className="pf-v6-u-mb-0">
+            {t(
+              'Production network uses the same interface as your browser session. Applying network settings will disconnect this Cockpit session. Configuration continues in the background; reconnect to the setup network if enrollment fails.',
+            )}
+            <Checkbox
+              id="single-nic-ack"
+              className="pf-v6-u-mt-md"
+              label={t('I understand my browser connection may drop during apply')}
+              isChecked={values.singleNicWarningAcknowledged}
+              onChange={(_e, checked) => onChange({ singleNicWarningAcknowledged: checked })}
+            />
+          </Alert>
+        </StackItem>
+      )}
+
       <StackItem>
         <ReviewSection title={t('Device info')} stepId="general">
           <DescriptionList isCompact>
@@ -83,12 +103,6 @@ const CockpitOnsiteSetupReviewStep = ({ values }: CockpitOnsiteSetupStepProps) =
                 <DescriptionListDescription>{values.labels}</DescriptionListDescription>
               </DescriptionListGroup>
             )}
-            {values.description.trim() && (
-              <DescriptionListGroup>
-                <DescriptionListTerm>{t('Description')}</DescriptionListTerm>
-                <DescriptionListDescription>{values.description}</DescriptionListDescription>
-              </DescriptionListGroup>
-            )}
           </DescriptionList>
         </ReviewSection>
 
@@ -98,25 +112,16 @@ const CockpitOnsiteSetupReviewStep = ({ values }: CockpitOnsiteSetupStepProps) =
               <DescriptionListTerm>{t('Configuration')}</DescriptionListTerm>
               <DescriptionListDescription>{getNetworkSummary(values, t)}</DescriptionListDescription>
             </DescriptionListGroup>
-            {configuredProxies.length > 0 && (
+            {configuredProxies.length > 0 && values.proxyUsername.trim() && (
               <DescriptionListGroup>
-                <DescriptionListTerm>{t('HTTP proxies')}</DescriptionListTerm>
-                <DescriptionListDescription>{configuredProxies.join(', ')}</DescriptionListDescription>
+                <DescriptionListTerm>{t('Proxy authentication')}</DescriptionListTerm>
+                <DescriptionListDescription>
+                  {values.proxyUsername} / {maskSecret(values.proxyPassword)}
+                </DescriptionListDescription>
               </DescriptionListGroup>
             )}
           </DescriptionList>
         </ReviewSection>
-
-        {values.ntpServer.trim() && (
-          <ReviewSection title={t('Services')} stepId="network">
-            <DescriptionList isCompact>
-              <DescriptionListGroup>
-                <DescriptionListTerm>{t('NTP')}</DescriptionListTerm>
-                <DescriptionListDescription>{values.ntpServer}</DescriptionListDescription>
-              </DescriptionListGroup>
-            </DescriptionList>
-          </ReviewSection>
-        )}
 
         <ReviewSection title={t('Enrollment config')} stepId="enrollment">
           <DescriptionList isCompact>
@@ -124,9 +129,9 @@ const CockpitOnsiteSetupReviewStep = ({ values }: CockpitOnsiteSetupStepProps) =
               <DescriptionListTerm>{t('Services')}</DescriptionListTerm>
               <DescriptionListDescription>{getEnrollmentConfigSummary(values, t)}</DescriptionListDescription>
             </DescriptionListGroup>
-            {values.flightControlEnabled && values.enrollmentCredentialMode === 'token' && (
+            {values.enrollmentServiceMode === 'provision' && values.enrollmentCredentialMode === 'token' && (
               <DescriptionListGroup>
-                <DescriptionListTerm>{t('Token')}</DescriptionListTerm>
+                <DescriptionListTerm>{t('Auth token')}</DescriptionListTerm>
                 <DescriptionListDescription>{maskSecret(values.flightControlToken)}</DescriptionListDescription>
               </DescriptionListGroup>
             )}

@@ -18,17 +18,32 @@ async function ensureCaptureScript(page) {
     });
 }
 
+async function expandForCapture(page) {
+  await page.addStyleTag({
+    content: `
+      html, body, #primary-app-container, .pf-v6-c-page, .pf-v6-c-page__main,
+      .pf-v6-c-page__main-section, .pf-v6-c-page__main-body {
+        overflow: visible !important;
+        max-height: none !important;
+        height: auto !important;
+      }
+    `,
+  });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.waitForTimeout(400);
+}
+
 async function capturePage(page, captureId) {
   const endpoint = `https://mcp.figma.com/mcp/capture/${captureId}/submit`;
+  await expandForCapture(page);
   await ensureCaptureScript(page);
   await page.waitForTimeout(1500);
-  const result = await page.evaluate(
+  page.evaluate(
     ({ captureId, endpoint }) => window.figma.captureForDesign({ captureId, endpoint, selector: 'body' }),
     { captureId, endpoint },
   );
-  console.log(`Captured ${captureId}:`, result);
-  await page.waitForTimeout(5000);
-  return result;
+  console.log(`Submitted ${captureId}`);
+  await page.waitForTimeout(8000);
 }
 
 async function withPage(run) {
@@ -51,7 +66,8 @@ if (mode === 'modal' || mode === 'both') {
   await withPage(async (page) => {
     await page.getByRole('button', { name: 'Add devices' }).first().click();
     await page.getByRole('dialog').waitFor({ timeout: 30000 });
-    await page.getByText('Cockpit on the device', { exact: true }).waitFor({ timeout: 30000 });
+    await page.getByText('Before you go onsite', { exact: true }).waitFor({ timeout: 30000 });
+    await page.getByRole('tab', { name: 'Cockpit onsite onboarding' }).waitFor({ timeout: 30000 });
     await page.getByRole('button', { name: 'Open device onboarding' }).first().waitFor({ timeout: 30000 });
     await capturePage(page, captures.addDeviceModal);
   });

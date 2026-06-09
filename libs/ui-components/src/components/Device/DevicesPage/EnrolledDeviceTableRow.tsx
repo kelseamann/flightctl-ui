@@ -9,8 +9,6 @@ import { ListAction } from '../../ListPage/types';
 import ApplicationSummaryStatus from '../../Status/ApplicationSummaryStatus';
 import DeviceStatus from '../../Status/DeviceStatus';
 import SystemUpdateStatus from '../../Status/SystemUpdateStatus';
-import ProvisioningSourceLabel from '../../FirstBootCustomization/ProvisioningSourceLabel';
-import FirstBootCustomizationStatus from '../../Status/FirstBootCustomizationStatus';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { ROUTE, useNavigate } from '../../../hooks/useNavigate';
 import ResourceLink from '../../common/ResourceLink';
@@ -119,16 +117,6 @@ const EnrolledDeviceTableRow = ({
       {columnIds.includes('fleet') && (
         <Td dataLabel={t('Fleet')}>
           <DeviceFleet device={device} />
-        </Td>
-      )}
-      {columnIds.includes('provisioning') && (
-        <Td dataLabel={t('Provisioning')}>
-          <ProvisioningSourceLabel />
-        </Td>
-      )}
-      {columnIds.includes('firstBootCustomization') && (
-        <Td dataLabel={t('Onsite customization')}>
-          <FirstBootCustomizationStatus device={device} />
         </Td>
       )}
       {columnIds.includes('appStatus') && (

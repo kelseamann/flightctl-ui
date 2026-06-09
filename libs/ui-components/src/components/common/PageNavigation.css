@@ -3,11 +3,6 @@
   padding-block-end: 0;
 }
 
-.fctl-subnav_toolbar .pf-v6-c-toolbar__content {
-  flex-grow: 1;
-  width: 100%;
-}
-
-.fctl-subnav_toolbar-actions {
-  margin-inline-start: auto;
+.fctl-subnav_toolbar {
+  justify-content: flex-end;
 }

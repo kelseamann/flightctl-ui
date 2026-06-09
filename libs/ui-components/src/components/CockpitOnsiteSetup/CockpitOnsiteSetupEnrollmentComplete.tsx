@@ -18,14 +18,21 @@ const CockpitOnsiteSetupEnrollmentComplete = () => {
   return (
     <EmptyState variant={EmptyStateVariant.lg}>
       <Title headingLevel="h1" size="2xl">
-        {t('Enrollment complete')}
+        {t('Onboarding complete')}
       </Title>
       <EmptyStateBody>
         <Stack hasGutter>
           <StackItem>
             <Content component={ContentVariants.p} className="pf-v6-u-color-200">
               {t(
-                'Your device is enrolling and will appear on the Devices pending approval screen. Use the button below to return to Edge Manager and find your device.',
+                'Configuration was applied and Flight Control enrollment credentials were provisioned on this device. The flightctl-agent service will submit an enrollment request to Flight Control.',
+              )}
+            </Content>
+          </StackItem>
+          <StackItem>
+            <Content component={ContentVariants.p} className="pf-v6-u-color-200">
+              {t(
+                'A Flight Control operator must approve the device under Devices pending approval before it appears as an enrolled device. Use the button below to open Flight Control and find your device.',
               )}
             </Content>
           </StackItem>

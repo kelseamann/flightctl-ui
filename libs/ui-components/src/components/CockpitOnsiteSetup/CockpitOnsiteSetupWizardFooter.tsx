@@ -68,7 +68,7 @@ const CockpitOnsiteSetupWizardFooter = ({
     return null;
   }
 
-  const primaryLabel = isReview ? t('Start Enrollment') : t('Next step');
+  const primaryLabel = isReview ? t('Apply and enroll') : t('Next step');
 
   const onPrimary = () => {
     if (isReview) {

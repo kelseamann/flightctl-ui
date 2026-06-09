@@ -15,7 +15,7 @@ const CockpitOnsiteSetupGeneralStep = ({ values, onChange }: CockpitOnsiteSetupS
         </Title>
         <p className="pf-v6-u-color-200 pf-v6-u-mt-sm">
           {t(
-            'Cockpit applies the hostname to the system before enrollment. Labels and description help operators recognize the device in Flight Control.',
+            'Cockpit applies the hostname to the system before enrollment. Labels help operators recognize the device in Flight Control.',
           )}
         </p>
       </StackItem>
@@ -36,16 +36,6 @@ const CockpitOnsiteSetupGeneralStep = ({ values, onChange }: CockpitOnsiteSetupS
             value={values.labels}
             onChange={(_e, v) => onChange({ labels: v })}
             placeholder={t('key=value, one per line')}
-            rows={3}
-          />
-        </FormGroup>
-      </StackItem>
-      <StackItem>
-        <FormGroup label={t('Description')} fieldId="onsite-description">
-          <TextArea
-            id="onsite-description"
-            value={values.description}
-            onChange={(_e, v) => onChange({ description: v })}
             rows={3}
           />
         </FormGroup>

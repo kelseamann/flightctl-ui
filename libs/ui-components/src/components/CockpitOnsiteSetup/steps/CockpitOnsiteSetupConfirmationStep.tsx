@@ -4,19 +4,23 @@ import TimesCircleIcon from '@patternfly/react-icons/dist/js/icons/times-circle-
 
 import { useTranslation } from '../../../hooks/useTranslation';
 import { isDevMockApi } from '../../../utils/devMock';
+import { getEnrollmentFailureMessage } from '../cockpitOnsiteSetupSummary';
 import CockpitOnsiteSetupEnrollmentComplete from '../CockpitOnsiteSetupEnrollmentComplete';
-import type { EnrollmentOutcome } from '../types';
+import type { EnrollmentFailureCode } from '../types';
 import type { CockpitOnsiteSetupStepProps } from './CockpitOnsiteSetupStepProps';
 
 type CockpitOnsiteSetupConfirmationStepProps = CockpitOnsiteSetupStepProps & {
-  enrollmentOutcome: EnrollmentOutcome;
+  enrollmentOutcome: import('../types').EnrollmentOutcome;
   deviceConnected: boolean;
-  onEnrollmentComplete: (success: boolean, connected: boolean) => void;
+  enrollmentFailureCode?: EnrollmentFailureCode;
+  onEnrollmentComplete: (success: boolean, connected: boolean, failureCode?: EnrollmentFailureCode) => void;
 };
 
 const CockpitOnsiteSetupConfirmationStep = ({
+  values,
   enrollmentOutcome,
   deviceConnected,
+  enrollmentFailureCode,
   onEnrollmentComplete,
 }: CockpitOnsiteSetupConfirmationStepProps) => {
   const { t } = useTranslation();
@@ -45,10 +49,16 @@ const CockpitOnsiteSetupConfirmationStep = ({
           </StackItem>
           <StackItem className="pf-v6-u-text-align-center">
             <Title headingLevel="h1" size="2xl">
-              {t('Enrolling device…')}
+              {values.enrollmentServiceMode === 'connectivity_only'
+                ? t('Verifying connectivity…')
+                : t('Applying configuration…')}
             </Title>
             <p className="pf-v6-u-color-200 pf-v6-u-mt-sm">
-              {t('Cockpit is applying network settings and running enrollment scripts on the device.')}
+              {values.enrollmentServiceMode === 'connectivity_only'
+                ? t('Cockpit is running flightctl-agent test-connection against the Flight Control server.')
+                : t(
+                    'Cockpit is applying hostname, network, proxy, labels, and NTP settings, then running flightctl-agent enroll on the device.',
+                  )}
             </p>
           </StackItem>
         </Stack>
@@ -78,9 +88,7 @@ const CockpitOnsiteSetupConfirmationStep = ({
             ? t('Device is connected and reachable.')
             : t('Device is not connected — check network settings on the device.')}
         </p>
-        <p className="pf-v6-u-color-200 pf-v6-u-mt-sm">
-          {t('Return to the device Cockpit session to review enrollment script output and retry.')}
-        </p>
+        <p className="pf-v6-u-color-200 pf-v6-u-mt-sm">{getEnrollmentFailureMessage(enrollmentFailureCode, t)}</p>
         <Button variant="link" onClick={() => goToStepById('review')} className="pf-v6-u-mt-md">
           {t('Back to review')}
         </Button>

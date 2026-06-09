@@ -16,10 +16,13 @@ import { getInitialValues as getImageBuildInitialValues } from '../components/Im
 
 export const getDevMockCockpitOnsiteSetupInitialValues = (): CockpitOnsiteSetupValues => ({
   ...defaultCockpitOnsiteSetupValues,
-  hostname: 'localhost',
-  description: 'Edge node — plant floor rack 2',
+  hostname: 'warehouse-edge-07',
   labels: 'site=plant-a\nrole=edge',
+  networkConnectionType: 'ethernet',
+  ipv4Mode: 'static',
+  ipv4Address: '192.168.1.50/24',
   flightControlEndpoint: 'https://flightctl.example.com',
+  flightControlToken: 'mock-enrollment-token',
 });
 
 export const getDevMockImageBuildInitialValues = (): ImageBuildFormValues => ({

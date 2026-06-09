@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
   Button,
-  Divider,
   List,
   ListComponent,
   ListItem,
@@ -12,13 +11,21 @@ import {
   OrderType,
   Stack,
   StackItem,
-  Title,
+  Tab,
+  Tabs,
+  TabTitleText,
 } from '@patternfly/react-core';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/js/icons/external-link-alt-icon';
 
 import { useTranslation } from '../../../hooks/useTranslation';
 import LearnMoreLink from '../../common/LearnMoreLink';
+import { FlightCtlApp, useAppContext } from '../../../hooks/useAppContext';
 import { useAppLinks } from '../../../hooks/useAppLinks';
+import {
+  MOCK_DEVICE_COCKPIT_URL,
+  MOCK_SETUP_ETHERNET_CIDR,
+  MOCK_SETUP_WIFI_SSID,
+} from '../../CockpitOnsiteSetup/cockpitOnsiteSetupConstants';
 import { UX_BRANCH_EDM_3710, UX_BRANCH_PARAM, useUxBranch } from '../../../hooks/useUxBranch';
 
 const getOnsiteSetupUrl = (): string => {
@@ -26,11 +33,94 @@ const getOnsiteSetupUrl = (): string => {
   return `${window.location.origin}/onsite-setup?${params.toString()}`;
 };
 
+const OnsiteOnboardingTabContent = ({ onOpenOnsiteSetup }: { onOpenOnsiteSetup: () => void }) => {
+  const { t } = useTranslation();
+
+  return (
+    <Stack hasGutter>
+      <StackItem>
+        {t(
+          'For devices on unmanaged networks without DHCP, complete first-boot onboarding on the device through Cockpit before the device can submit an enrollment request to Flight Control.',
+        )}
+      </StackItem>
+      <StackItem>
+        <strong>{t('Before you go onsite')}</strong>
+        <List component={ListComponent.ul} className="pf-v6-u-mt-sm">
+          <ListItem>
+            {t(
+              'Sign in to Flight Control and copy the auth token for this device enrollment. You will paste it into the Cockpit wizard on the device — credentials are never generated onsite.',
+            )}
+          </ListItem>
+          <ListItem>
+            {t(
+              'Connect your laptop or phone to the device setup network (Wi-Fi access point or wired setup interface) before opening Cockpit.',
+            )}
+          </ListItem>
+        </List>
+      </StackItem>
+      <StackItem>
+        <strong>{t('Setup network access on the device')}</strong>
+        <List component={ListComponent.ul} className="pf-v6-u-mt-sm">
+          <ListItem>
+            {t('Wi-Fi access point:')}{' '}
+            <span className="pf-v6-u-font-family-monospace">{MOCK_SETUP_WIFI_SSID}</span>
+            {' — '}
+            {t('captive portal shows device serial and MAC, then redirects to Cockpit.')}
+          </ListItem>
+          <ListItem>
+            {t('Wired setup interface:')}{' '}
+            <span className="pf-v6-u-font-family-monospace">{MOCK_SETUP_ETHERNET_CIDR}</span>
+          </ListItem>
+          <ListItem>
+            {t('Cockpit URL (HTTP during setup):')}{' '}
+            <span className="pf-v6-u-font-family-monospace">{MOCK_DEVICE_COCKPIT_URL}</span>
+          </ListItem>
+        </List>
+      </StackItem>
+      <StackItem>
+        <Button
+          variant="link"
+          isInline
+          icon={<ExternalLinkAltIcon />}
+          iconPosition="end"
+          onClick={onOpenOnsiteSetup}
+        >
+          {t('Open device onboarding')}
+        </Button>
+        <p className="pf-v6-u-color-200 pf-v6-u-font-size-sm pf-v6-u-mt-xs">
+          {t('Prototype: opens the Cockpit onboarding wizard hosted in this Flight Control UI for demo purposes.')}
+        </p>
+      </StackItem>
+    </Stack>
+  );
+};
+
+const OsImageEnrollmentTabContent = ({ steps }: { steps: string[] }) => {
+  const { t } = useTranslation();
+
+  return (
+    <Stack hasGutter>
+      <StackItem>{t('Add devices by building and booting a Flight Control OS image:')}</StackItem>
+      <StackItem>
+        <List component={ListComponent.ol} type={OrderType.number}>
+          {steps.map((step) => (
+            <ListItem key={step}>{step}</ListItem>
+          ))}
+        </List>
+      </StackItem>
+    </Stack>
+  );
+};
+
 const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
   const { t } = useTranslation();
+  const { appType } = useAppContext();
   const { isFirstBootCustomizationBranch } = useUxBranch();
   const addNewDevicesLink = useAppLinks('addNewDevice');
   const onsiteSetupUrl = React.useMemo(() => getOnsiteSetupUrl(), []);
+  const [activeTabKey, setActiveTabKey] = React.useState<string | number>('onsite');
+  const isStandaloneWebApp = appType === FlightCtlApp.STANDALONE;
+  const useTabbedLayout = isStandaloneWebApp && isFirstBootCustomizationBranch;
 
   const legacySteps = [
     t('Request an enrollment certificate for your device'),
@@ -44,50 +134,36 @@ const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
     onClose();
   };
 
+  const showOnsitePrimaryAction = useTabbedLayout && activeTabKey === 'onsite';
+
   return (
-    <Modal variant="small" onClose={onClose} isOpen>
+    <Modal variant={useTabbedLayout ? 'medium' : 'small'} onClose={onClose} isOpen>
       <ModalHeader title={t('Add devices')} />
       <ModalBody>
         <Stack hasGutter>
-          {isFirstBootCustomizationBranch ? (
+          {useTabbedLayout ? (
+            <StackItem>
+              <Tabs
+                activeKey={activeTabKey}
+                onSelect={(_event, tabIndex) => setActiveTabKey(tabIndex)}
+                aria-label={t('Add devices workflows')}
+              >
+                <Tab eventKey="onsite" title={<TabTitleText>{t('Cockpit onsite onboarding')}</TabTitleText>}>
+                  <OnsiteOnboardingTabContent onOpenOnsiteSetup={openOnsiteSetup} />
+                </Tab>
+                <Tab eventKey="os-image" title={<TabTitleText>{t('OS image enrollment')}</TabTitleText>}>
+                  <OsImageEnrollmentTabContent steps={legacySteps} />
+                </Tab>
+              </Tabs>
+            </StackItem>
+          ) : isFirstBootCustomizationBranch ? (
             <>
               <StackItem>
-                {t(
-                  'Onboard the device in Cockpit before it appears in Devices pending approval. Open Device Onboarding on the device from a browser on your phone or laptop.',
-                )}
+                <OnsiteOnboardingTabContent onOpenOnsiteSetup={openOnsiteSetup} />
               </StackItem>
               <StackItem>
-                <strong>{t('Cockpit on the device')}</strong>
-                <div className="pf-v6-u-mt-sm pf-v6-u-font-family-monospace pf-v6-u-color-200">
-                  https://&lt;device-host&gt;/cockpit
-                </div>
-              </StackItem>
-              <StackItem>
-                {t(
-                  'Ensure you have network access to Cockpit on the device before starting onboarding.',
-                )}
-              </StackItem>
-              <StackItem>
-                <Button
-                  variant="link"
-                  isInline
-                  icon={<ExternalLinkAltIcon />}
-                  iconPosition="end"
-                  onClick={openOnsiteSetup}
-                >
-                  {t('Open device onboarding')}
-                </Button>
-              </StackItem>
-              <StackItem>
-                <Divider />
-              </StackItem>
-              <StackItem>
-                <Title headingLevel="h4" size="md">
-                  {t('Or add devices using an OS image:')}
-                </Title>
-              </StackItem>
-              <StackItem>
-                <List component={ListComponent.ol} type={OrderType.number}>
+                <strong>{t('Or add devices using an OS image:')}</strong>
+                <List component={ListComponent.ol} type={OrderType.number} className="pf-v6-u-mt-sm">
                   {legacySteps.map((step) => (
                     <ListItem key={step}>{step}</ListItem>
                   ))}
@@ -95,16 +171,9 @@ const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
               </StackItem>
             </>
           ) : (
-            <>
-              <StackItem>{t('You can add devices following these steps:')}</StackItem>
-              <StackItem>
-                <List component={ListComponent.ol} type={OrderType.number}>
-                  {legacySteps.map((step) => (
-                    <ListItem key={step}>{step}</ListItem>
-                  ))}
-                </List>
-              </StackItem>
-            </>
+            <StackItem>
+              <OsImageEnrollmentTabContent steps={legacySteps} />
+            </StackItem>
           )}
           <StackItem>
             <LearnMoreLink link={addNewDevicesLink} text={t('Learn more about adding devices')} />
@@ -115,7 +184,7 @@ const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
         <Button variant="link" onClick={onClose}>
           {t('Close')}
         </Button>
-        {isFirstBootCustomizationBranch && (
+        {showOnsitePrimaryAction && (
           <Button variant="primary" icon={<ExternalLinkAltIcon />} iconPosition="end" onClick={openOnsiteSetup}>
             {t('Open device onboarding')}
           </Button>
