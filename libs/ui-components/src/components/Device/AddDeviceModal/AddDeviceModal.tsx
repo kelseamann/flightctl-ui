@@ -33,7 +33,7 @@ const getOnsiteSetupUrl = (): string => {
   return `${window.location.origin}/onsite-setup?${params.toString()}`;
 };
 
-const OnsiteOnboardingTabContent = ({ onOpenOnsiteSetup }: { onOpenOnsiteSetup: () => void }) => {
+const OnsiteOnboardingTabContent = () => {
   const { t } = useTranslation();
 
   return (
@@ -77,25 +77,11 @@ const OnsiteOnboardingTabContent = ({ onOpenOnsiteSetup }: { onOpenOnsiteSetup: 
           </ListItem>
         </List>
       </StackItem>
-      <StackItem>
-        <Button
-          variant="link"
-          isInline
-          icon={<ExternalLinkAltIcon />}
-          iconPosition="end"
-          onClick={onOpenOnsiteSetup}
-        >
-          {t('Open device onboarding')}
-        </Button>
-        <p className="pf-v6-u-color-200 pf-v6-u-font-size-sm pf-v6-u-mt-xs">
-          {t('Prototype: opens the Cockpit onboarding wizard hosted in this Flight Control UI for demo purposes.')}
-        </p>
-      </StackItem>
     </Stack>
   );
 };
 
-const OsImageEnrollmentTabContent = ({ steps }: { steps: string[] }) => {
+const OsImageEnrollmentTabContent = ({ steps, learnMoreLink }: { steps: string[]; learnMoreLink: string }) => {
   const { t } = useTranslation();
 
   return (
@@ -107,6 +93,9 @@ const OsImageEnrollmentTabContent = ({ steps }: { steps: string[] }) => {
             <ListItem key={step}>{step}</ListItem>
           ))}
         </List>
+      </StackItem>
+      <StackItem>
+        <LearnMoreLink link={learnMoreLink} text={t('Learn more about adding devices')} />
       </StackItem>
     </Stack>
   );
@@ -137,48 +126,48 @@ const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
   const showOnsitePrimaryAction = useTabbedLayout && activeTabKey === 'onsite';
 
   return (
-    <Modal variant={useTabbedLayout ? 'medium' : 'small'} onClose={onClose} isOpen>
+    <Modal variant={useTabbedLayout ? 'large' : 'small'} onClose={onClose} isOpen>
       <ModalHeader title={t('Add devices')} />
       <ModalBody>
-        <Stack hasGutter>
-          {useTabbedLayout ? (
-            <StackItem>
-              <Tabs
-                activeKey={activeTabKey}
-                onSelect={(_event, tabIndex) => setActiveTabKey(tabIndex)}
-                aria-label={t('Add devices workflows')}
-              >
-                <Tab eventKey="onsite" title={<TabTitleText>{t('Cockpit onsite onboarding')}</TabTitleText>}>
-                  <OnsiteOnboardingTabContent onOpenOnsiteSetup={openOnsiteSetup} />
-                </Tab>
-                <Tab eventKey="os-image" title={<TabTitleText>{t('OS image enrollment')}</TabTitleText>}>
-                  <OsImageEnrollmentTabContent steps={legacySteps} />
-                </Tab>
-              </Tabs>
-            </StackItem>
-          ) : isFirstBootCustomizationBranch ? (
-            <>
+        {useTabbedLayout ? (
+          <Tabs
+            activeKey={activeTabKey}
+            onSelect={(_event, tabIndex) => setActiveTabKey(tabIndex)}
+            aria-label={t('Add devices workflows')}
+          >
+            <Tab eventKey="onsite" title={<TabTitleText>{t('Cockpit onsite onboarding')}</TabTitleText>}>
+              <OnsiteOnboardingTabContent />
+            </Tab>
+            <Tab eventKey="os-image" title={<TabTitleText>{t('OS image enrollment')}</TabTitleText>}>
+              <OsImageEnrollmentTabContent steps={legacySteps} learnMoreLink={addNewDevicesLink} />
+            </Tab>
+          </Tabs>
+        ) : (
+          <Stack hasGutter>
+            {isFirstBootCustomizationBranch ? (
+              <>
+                <StackItem>
+                  <OnsiteOnboardingTabContent />
+                </StackItem>
+                <StackItem>
+                  <strong>{t('Or add devices using an OS image:')}</strong>
+                  <List component={ListComponent.ol} type={OrderType.number} className="pf-v6-u-mt-sm">
+                    {legacySteps.map((step) => (
+                      <ListItem key={step}>{step}</ListItem>
+                    ))}
+                  </List>
+                </StackItem>
+                <StackItem>
+                  <LearnMoreLink link={addNewDevicesLink} text={t('Learn more about adding devices')} />
+                </StackItem>
+              </>
+            ) : (
               <StackItem>
-                <OnsiteOnboardingTabContent onOpenOnsiteSetup={openOnsiteSetup} />
+                <OsImageEnrollmentTabContent steps={legacySteps} learnMoreLink={addNewDevicesLink} />
               </StackItem>
-              <StackItem>
-                <strong>{t('Or add devices using an OS image:')}</strong>
-                <List component={ListComponent.ol} type={OrderType.number} className="pf-v6-u-mt-sm">
-                  {legacySteps.map((step) => (
-                    <ListItem key={step}>{step}</ListItem>
-                  ))}
-                </List>
-              </StackItem>
-            </>
-          ) : (
-            <StackItem>
-              <OsImageEnrollmentTabContent steps={legacySteps} />
-            </StackItem>
-          )}
-          <StackItem>
-            <LearnMoreLink link={addNewDevicesLink} text={t('Learn more about adding devices')} />
-          </StackItem>
-        </Stack>
+            )}
+          </Stack>
+        )}
       </ModalBody>
       <ModalFooter>
         <Button variant="link" onClick={onClose}>
