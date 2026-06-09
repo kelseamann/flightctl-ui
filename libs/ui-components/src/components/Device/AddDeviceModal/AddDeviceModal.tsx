@@ -17,17 +17,11 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import LearnMoreLink from '../../common/LearnMoreLink';
 import { useAppLinks } from '../../../hooks/useAppLinks';
 import { useUxBranch } from '../../../hooks/useUxBranch';
-import { Link, ROUTE } from '../../../hooks/useNavigate';
-import { getOnboardingJourneySteps, RHEM_REPORTING_START_STEP } from '../../../utils/onboardingJourney';
 
 const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
   const { t } = useTranslation();
   const { isFirstBootCustomizationBranch } = useUxBranch();
   const addNewDevicesLink = useAppLinks('addNewDevice');
-
-  const rhemSteps = isFirstBootCustomizationBranch
-    ? getOnboardingJourneySteps(t).slice(RHEM_REPORTING_START_STEP - 1)
-    : [];
 
   const legacySteps = [
     t('Request an enrollment certificate for your device'),
@@ -45,24 +39,19 @@ const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
             <>
               <StackItem>
                 {t(
-                  'Complete Cockpit system onboarding on the device in a browser (phone or laptop), then use RHEM to approve enrollment and assign a fleet.',
+                  'Onboard the device in Cockpit before it appears in Devices pending approval. Open Device Onboarding on the device from a browser on your phone or laptop.',
                 )}
               </StackItem>
               <StackItem>
-                <Button
-                  variant="link"
-                  isInline
-                  component={(props) => <Link to={ROUTE.ONSITE_SETUP} {...props} />}
-                >
-                  {t('Open onsite setup wizard prototype')}
-                </Button>
+                <strong>{t('Cockpit on the device')}</strong>
+                <div className="pf-v6-u-mt-sm pf-v6-u-font-family-monospace pf-v6-u-color-200">
+                  https://&lt;device-host&gt;/cockpit
+                </div>
               </StackItem>
               <StackItem>
-                <List component={ListComponent.ol} type={OrderType.number}>
-                  {rhemSteps.map((step) => (
-                    <ListItem key={step.id}>{step.label}</ListItem>
-                  ))}
-                </List>
+                {t(
+                  'Ensure you have network access to Cockpit on the device before starting onboarding.',
+                )}
               </StackItem>
             </>
           ) : (

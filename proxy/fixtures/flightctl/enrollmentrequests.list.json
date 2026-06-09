@@ -7,6 +7,26 @@
       "apiVersion": "v1beta1",
       "kind": "EnrollmentRequest",
       "metadata": {
+        "creationTimestamp": "2026-06-09T13:30:00Z",
+        "labels": {},
+        "name": "c142733f9855904932096fc6274h179hcc964gd8278960de01287e0031f351"
+      },
+      "spec": {
+        "csr": "-----BEGIN CERTIFICATE-----\nCERTIFICATE CONTENT\n-----END CERTIFICATE-----\n",
+        "labels": {
+          "alias": "warehouse-edge-07",
+          "flightctl.io/provisioning": "cockpit",
+          "flightctl.io/first-boot-customization": "complete"
+        }
+      },
+      "status": {
+        "conditions": []
+      }
+    },
+    {
+      "apiVersion": "v1beta1",
+      "kind": "EnrollmentRequest",
+      "metadata": {
         "creationTimestamp": "2024-04-10T12:15:31Z",
         "labels": {},
         "name": "a021622d8633782719874da4052f957faa742fc7050026748bc79065c8819d139"
