@@ -27,8 +27,17 @@ export type CockpitOnsiteSetupValues = {
   vlanId: string;
   ipv4Mode: Ipv4Mode;
   ipv4AutoDns: boolean;
+  ipv4Address: string;
+  ipv4SubnetMask: string;
+  ipv4Gateway: string;
+  ipv4PrimaryDns: string;
+  ipv4SecondaryDns: string;
   ipv6Mode: Ipv6Mode;
   ipv6AutoDns: boolean;
+  ipv6Address: string;
+  ipv6Gateway: string;
+  ipv6PrimaryDns: string;
+  ipv6SecondaryDns: string;
   ntpServerHostname: string;
   proxyProtocol: ProxyProtocol;
   proxyHostname: string;
@@ -53,9 +62,18 @@ export const defaultCockpitOnsiteSetupValues: CockpitOnsiteSetupValues = {
   selectedNetworkInterface: 'eth0',
   vlanId: '',
   ipv4Mode: 'dhcpv4',
-  ipv4AutoDns: false,
-  ipv6Mode: 'disabled',
-  ipv6AutoDns: false,
+  ipv4AutoDns: true,
+  ipv4Address: '',
+  ipv4SubnetMask: '',
+  ipv4Gateway: '',
+  ipv4PrimaryDns: '',
+  ipv4SecondaryDns: '',
+  ipv6Mode: 'dhcpv6',
+  ipv6AutoDns: true,
+  ipv6Address: '',
+  ipv6Gateway: '',
+  ipv6PrimaryDns: '',
+  ipv6SecondaryDns: '',
   ntpServerHostname: 'pool.ntp.org',
   proxyProtocol: 'HTTP',
   proxyHostname: '',

@@ -14,7 +14,6 @@ export type CockpitOnsiteSetupStepId = (typeof COCKPIT_ONSITE_SETUP_NAV_STEP_ORD
 export type FigmaNetworkInterfaceRow = {
   device: string;
   macAddress: string;
-  mtu: string;
   speed: string;
   driver: string;
   type: string;
@@ -24,9 +23,22 @@ export const FIGMA_NETWORK_INTERFACES: FigmaNetworkInterfaceRow[] = [
   {
     device: 'eth0',
     macAddress: '00:00:00:00:00:00',
-    mtu: 'auto',
     speed: '1000 Mb/s',
     driver: 'igc',
-    type: 'ethernet 1000T',
+    type: 'Ethernet',
+  },
+  {
+    device: 'eth1',
+    macAddress: '00:11:22:33:44:55',
+    speed: '100 Mb/s',
+    driver: 'e1000',
+    type: 'Ethernet',
+  },
+  {
+    device: 'eth2',
+    macAddress: '00:AA:BB:CC:DD:EE',
+    speed: '1000 Mb/s',
+    driver: 'igc',
+    type: 'Ethernet',
   },
 ];

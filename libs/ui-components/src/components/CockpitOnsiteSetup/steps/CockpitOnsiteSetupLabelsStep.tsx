@@ -15,6 +15,7 @@ import MinusCircleIcon from '@patternfly/react-icons/dist/js/icons/minus-circle-
 import PlusCircleIcon from '@patternfly/react-icons/dist/js/icons/plus-circle-icon';
 
 import { useTranslation } from '../../../hooks/useTranslation';
+import InputGroupHeading from '../../common/InputGroupHeading';
 import type { LabelKeyValue, LabelMapping } from '../types';
 import type { CockpitOnsiteSetupStepProps } from './CockpitOnsiteSetupStepProps';
 
@@ -82,9 +83,14 @@ const CockpitOnsiteSetupLabelsStep = ({ values, onChange }: CockpitOnsiteSetupSt
         <Title headingLevel="h2" size="md" className="pf-v6-u-mb-md">
           {t('Hostname and Alias')}
         </Title>
-        <FormGroup label={t('Hostname')} isRequired fieldId="onsite-labels-hostname">
+        <FormGroup fieldId="onsite-labels-hostname">
+          <InputGroupHeading id="onsite-labels-hostname-heading" isRequired>
+            {t('Hostname')}
+          </InputGroupHeading>
           <TextInput
             id="onsite-labels-hostname"
+            aria-labelledby="onsite-labels-hostname-heading"
+            required
             value={values.hostname}
             onChange={(_e, v) => onChange({ hostname: v })}
             placeholder="example-endpoint-123"
@@ -95,9 +101,11 @@ const CockpitOnsiteSetupLabelsStep = ({ values, onChange }: CockpitOnsiteSetupSt
             </HelperText>
           </FormHelperText>
         </FormGroup>
-        <FormGroup label={t('Alias')} fieldId="onsite-labels-alias" className="pf-v6-u-mt-md">
+        <FormGroup fieldId="onsite-labels-alias" className="pf-v6-u-mt-md">
+          <InputGroupHeading id="onsite-labels-alias-heading">{t('Alias')}</InputGroupHeading>
           <TextInput
             id="onsite-labels-alias"
+            aria-labelledby="onsite-labels-alias-heading"
             value={values.deviceAlias}
             onChange={(_e, v) => onChange({ deviceAlias: v })}
             placeholder="example-endpoint-123"
@@ -114,28 +122,41 @@ const CockpitOnsiteSetupLabelsStep = ({ values, onChange }: CockpitOnsiteSetupSt
         <Title headingLevel="h2" size="md" className="pf-v6-u-mb-md">
           {t('Custom labels for fleet assignment')}
         </Title>
+        <div className="fctl-cockpit-label-field-header-row">
+          <div className="fctl-cockpit-label-field-header-row__field">
+            <InputGroupHeading id="onsite-custom-label-key-heading">{t('Label key')}</InputGroupHeading>
+          </div>
+          <div className="fctl-cockpit-label-field-header-row__field">
+            <InputGroupHeading id="onsite-custom-label-value-heading">{t('Label value')}</InputGroupHeading>
+          </div>
+          <div className="fctl-cockpit-label-field-header-row__remove-spacer" aria-hidden="true" />
+        </div>
         {values.customLabels.map((row, index) => (
-          <div
-            key={`custom-label-${index}`}
-            className="pf-v6-l-flex pf-v6-u-gap-md pf-v6-u-align-items-flex-end pf-v6-u-mb-md"
-          >
-            <FormGroup label={index === 0 ? t('Label key') : undefined} fieldId={`onsite-custom-label-key-${index}`}>
+          <div key={`custom-label-${index}`} className="fctl-cockpit-label-field-row">
+            <FormGroup fieldId={`onsite-custom-label-key-${index}`} className="fctl-cockpit-label-field-row__field">
               <TextInput
                 id={`onsite-custom-label-key-${index}`}
+                aria-labelledby="onsite-custom-label-key-heading"
                 value={row.key}
                 onChange={(_e, v) => updateCustomLabel(index, 'key', v)}
                 placeholder={t('Type key')}
               />
             </FormGroup>
-            <FormGroup label={index === 0 ? t('Label value') : undefined} fieldId={`onsite-custom-label-value-${index}`}>
+            <FormGroup fieldId={`onsite-custom-label-value-${index}`} className="fctl-cockpit-label-field-row__field">
               <TextInput
                 id={`onsite-custom-label-value-${index}`}
+                aria-labelledby="onsite-custom-label-value-heading"
                 value={row.value}
                 onChange={(_e, v) => updateCustomLabel(index, 'value', v)}
                 placeholder={t('Type value')}
               />
             </FormGroup>
-            <Button variant="plain" aria-label={t('Remove label')} onClick={() => removeCustomLabel(index)}>
+            <Button
+              className="fctl-cockpit-label-field-row__remove"
+              variant="plain"
+              aria-label={t('Remove label')}
+              onClick={() => removeCustomLabel(index)}
+            >
               <MinusCircleIcon />
             </Button>
           </div>
@@ -152,25 +173,41 @@ const CockpitOnsiteSetupLabelsStep = ({ values, onChange }: CockpitOnsiteSetupSt
         <p className="pf-v6-u-color-200 pf-v6-u-font-size-sm pf-v6-u-mb-md">
           {t('Automatically derive labels from device hardware and OS information')}
         </p>
+        <div className="fctl-cockpit-label-field-header-row">
+          <div className="fctl-cockpit-label-field-header-row__field">
+            <InputGroupHeading id="onsite-mapping-key-heading">{t('Label key')}</InputGroupHeading>
+          </div>
+          <div className="fctl-cockpit-label-field-header-row__field">
+            <InputGroupHeading id="onsite-mapping-field-heading">{t('System info field')}</InputGroupHeading>
+          </div>
+          <div className="fctl-cockpit-label-field-header-row__remove-spacer" aria-hidden="true" />
+        </div>
         {values.labelMappings.map((row, index) => (
-          <div
-            key={`label-mapping-${index}`}
-            className="pf-v6-l-flex pf-v6-u-gap-md pf-v6-u-align-items-flex-end pf-v6-u-mb-md"
-          >
-            <FormGroup label={index === 0 ? t('Label key') : undefined} fieldId={`onsite-mapping-key-${index}`}>
+          <div key={`label-mapping-${index}`} className="fctl-cockpit-label-field-row">
+            <FormGroup fieldId={`onsite-mapping-key-${index}`} className="fctl-cockpit-label-field-row__field">
               <TextInput
                 id={`onsite-mapping-key-${index}`}
+                aria-labelledby="onsite-mapping-key-heading"
                 value={row.key}
                 onChange={(_e, v) => updateMapping(index, 'key', v)}
                 placeholder={t('Type key')}
               />
             </FormGroup>
-            <FormGroup label={index === 0 ? t('System info field') : undefined} fieldId={`onsite-mapping-field-${index}`}>
-              <MenuToggle aria-label={t('System info field')} style={{ width: '100%' }}>
+            <FormGroup fieldId={`onsite-mapping-field-${index}`} className="fctl-cockpit-label-field-row__field">
+              <MenuToggle
+                aria-label={t('System info field')}
+                aria-labelledby="onsite-mapping-field-heading"
+                style={{ width: '100%' }}
+              >
                 {row.systemInfoField || t('Menu toggle')}
               </MenuToggle>
             </FormGroup>
-            <Button variant="plain" aria-label={t('Remove mapping')} onClick={() => removeMapping(index)}>
+            <Button
+              className="fctl-cockpit-label-field-row__remove"
+              variant="plain"
+              aria-label={t('Remove mapping')}
+              onClick={() => removeMapping(index)}
+            >
               <MinusCircleIcon />
             </Button>
           </div>

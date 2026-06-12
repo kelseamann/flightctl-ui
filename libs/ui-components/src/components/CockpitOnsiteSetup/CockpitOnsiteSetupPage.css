@@ -49,3 +49,40 @@ body:has(.fctl-cockpit-onsite-setup-page) {
   flex-shrink: 0;
 }
 
+.fctl-cockpit-onsite-setup-page .pf-v6-c-form__group-control > .pf-v6-c-form__helper-text {
+  margin-block-end: 0;
+  margin-block-start: var(--pf-t--global--spacer--xs);
+}
+
+.fctl-cockpit-label-field-header-row {
+  display: flex;
+  gap: var(--pf-t--global--spacer--md);
+  margin-bottom: var(--pf-t--global--spacer--sm);
+}
+
+.fctl-cockpit-label-field-header-row__field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.fctl-cockpit-label-field-header-row__remove-spacer {
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+}
+
+.fctl-cockpit-label-field-row {
+  align-items: center;
+  display: flex;
+  gap: var(--pf-t--global--spacer--md);
+  margin-bottom: var(--pf-t--global--spacer--md);
+}
+
+.fctl-cockpit-label-field-row__field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.fctl-cockpit-label-field-row__remove {
+  flex: 0 0 auto;
+}
+
