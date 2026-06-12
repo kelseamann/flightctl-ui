@@ -1,11 +1,51 @@
+html:has(.fctl-cockpit-onsite-setup-page),
+body:has(.fctl-cockpit-onsite-setup-page) {
+  height: 100%;
+  overflow: hidden;
+}
+
 .fctl-cockpit-onsite-setup-page.fctl-cockpit-interface-shell {
-  min-height: 100vh;
+  height: 100%;
+  max-height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .fctl-cockpit-onsite-setup-page .pf-v6-c-wizard {
-  flex: 1;
+  --pf-v6-c-wizard--Height: 100%;
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
+}
+
+.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard__outer-wrap {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard__inner-wrap {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard__main {
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard__footer,
+.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard__footer-wrapper {
+  flex-shrink: 0;
 }
 

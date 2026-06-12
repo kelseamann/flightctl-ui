@@ -48,12 +48,12 @@ const CockpitOnsiteSetupNetworkStep = ({ values, onChange }: CockpitOnsiteSetupS
           <Thead>
             <Tr>
               <Th screenReaderText={t('Select interface')} />
-              <Th>{t('Device')}</Th>
-              <Th>{t('MAC address')}</Th>
-              <Th>{t('MTU')}</Th>
-              <Th>{t('Speed')}</Th>
-              <Th>{t('Driver')}</Th>
+              <Th>{t('Name')}</Th>
               <Th>{t('Type')}</Th>
+              <Th>{t('Mac address')}</Th>
+              <Th>{t('Vendor and model')}</Th>
+              <Th>{t('Speed')}</Th>
+              <Th>{t('State')}</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -70,12 +70,12 @@ const CockpitOnsiteSetupNetworkStep = ({ values, onChange }: CockpitOnsiteSetupS
                       aria-label={t('Select {{name}}', { name: iface.device })}
                     />
                   </Td>
-                  <Td dataLabel={t('Device')}>{iface.device}</Td>
-                  <Td dataLabel={t('MAC address')}>{iface.macAddress}</Td>
-                  <Td dataLabel={t('MTU')}>{iface.mtu}</Td>
-                  <Td dataLabel={t('Speed')}>{iface.speed}</Td>
-                  <Td dataLabel={t('Driver')}>{iface.driver}</Td>
+                  <Td dataLabel={t('Name')}>{iface.device}</Td>
                   <Td dataLabel={t('Type')}>{iface.type}</Td>
+                  <Td dataLabel={t('Mac address')}>{iface.macAddress}</Td>
+                  <Td dataLabel={t('Vendor and model')}>{iface.driver}</Td>
+                  <Td dataLabel={t('Speed')}>{iface.speed}</Td>
+                  <Td dataLabel={t('State')}>{iface.mtu}</Td>
                 </Tr>
               );
             })}

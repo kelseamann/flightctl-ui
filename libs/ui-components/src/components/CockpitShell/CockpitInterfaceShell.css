@@ -9,7 +9,8 @@
   --fctl-cockpit-shell-topbar-height: 48px;
   --fctl-cockpit-shell-sidebar-width: 220px;
 
-  min-height: 100vh;
+  height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--fctl-cockpit-shell-bg);
@@ -49,6 +50,7 @@
   display: flex;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
 }
 
 .fctl-cockpit-interface-shell__sidebar {
@@ -103,15 +105,20 @@
   flex-direction: column;
   min-height: 0;
   min-width: 0;
+  overflow: hidden;
 }
 
 /* PatternFly wizard inside Cockpit shell */
 .fctl-cockpit-interface-shell .pf-v6-c-wizard {
   --pf-v6-c-wizard--BackgroundColor: transparent;
+  --pf-v6-c-wizard--Height: 100%;
   background: transparent;
   color: var(--fctl-cockpit-shell-text);
+  display: flex;
   flex: 1;
+  flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 
 .fctl-cockpit-interface-shell .pf-v6-c-wizard__header {
@@ -119,81 +126,41 @@
 }
 
 .fctl-cockpit-interface-shell .pf-v6-c-wizard__outer-wrap,
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__inner-wrap,
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__main {
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__inner-wrap {
   background: transparent;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 
 .fctl-cockpit-interface-shell .pf-v6-c-wizard__main {
   align-items: stretch;
-  display: flex;
-  flex: 1;
-  flex-direction: row;
-}
-
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav {
-  background: var(--fctl-cockpit-shell-surface);
-  border-right: 1px solid var(--fctl-cockpit-shell-border);
-  flex: 0 0 240px;
-  padding: 24px 16px;
-}
-
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-list {
-  counter-reset: fctl-cockpit-wizard-step;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-list-item {
-  margin: 0;
-}
-
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-link {
-  background: transparent;
-  border: 0;
-  border-radius: 4px;
-  color: var(--fctl-cockpit-shell-text-muted);
-  counter-increment: fctl-cockpit-wizard-step;
-  display: block;
-  font-size: 14px;
-  line-height: 1.4;
-  margin: 0 0 4px;
-  padding: 8px 12px;
-  text-align: left;
-  width: 100%;
-}
-
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-link::before {
-  content: counter(fctl-cockpit-wizard-step) '. ';
-}
-
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-link.pf-m-current {
-  background: var(--fctl-cockpit-shell-nav-active);
-  color: var(--fctl-cockpit-shell-text);
-  font-weight: 600;
-}
-
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-link:disabled,
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-link.pf-m-disabled {
-  color: #8b8d8f;
-  opacity: 1;
-}
-
-.fctl-cockpit-interface-shell .pf-v6-c-wizard__main-body {
   background: var(--fctl-cockpit-shell-surface);
   display: flex;
   flex: 1;
   flex-direction: column;
   min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav {
+  --pf-v6-c-wizard__nav--BackgroundColor: var(--fctl-cockpit-shell-surface);
+  --pf-v6-c-wizard__nav--lg--BorderInlineEndColor: var(--fctl-cockpit-shell-border);
+  background: var(--fctl-cockpit-shell-surface);
+  border-right: 1px solid var(--fctl-cockpit-shell-border);
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__main-body {
   padding: 24px;
 }
 
 .fctl-cockpit-interface-shell .pf-v6-c-wizard__footer,
 .fctl-cockpit-interface-shell .pf-v6-c-wizard__footer-wrapper {
   border-top: 1px solid var(--fctl-cockpit-shell-border);
-  margin-top: auto;
+  flex-shrink: 0;
   padding-top: 16px;
 }
 

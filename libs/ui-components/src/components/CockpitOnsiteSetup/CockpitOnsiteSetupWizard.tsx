@@ -5,6 +5,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { isDevMockApi } from '../../utils/devMock';
 import { isWizardStepDisabled } from '../../utils/wizards';
 import CockpitOnsiteSetupWizardFooter from './CockpitOnsiteSetupWizardFooter';
+import CockpitOnsiteSetupWizardNav from './CockpitOnsiteSetupWizardNav';
 import { getCockpitOnsiteSetupInitialValues } from './cockpitOnsiteSetupInitialValues';
 import { COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER } from './cockpitOnsiteSetupConstants';
 import {
@@ -92,8 +93,10 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
 
   return (
     <Wizard
+      height="100%"
       title={t('First-boot device onboarding')}
       onClose={onCancel}
+      nav={<CockpitOnsiteSetupWizardNav />}
       footer={
         <CockpitOnsiteSetupWizardFooter
           isStepValid={isStepValid}
