@@ -1,78 +1,77 @@
-export type NetworkConnectionType = 'ethernet' | 'wifi' | 'other';
+export type Ipv4Mode = 'dhcpv4' | 'static';
 
-export type Ipv4Mode = 'auto' | 'static' | 'disabled';
+export type Ipv6Mode = 'dhcpv6' | 'static' | 'disabled';
 
-export type Ipv6Mode = 'auto' | 'dhcp' | 'static' | 'disabled';
+export type ProxyProtocol = 'HTTP' | 'HTTPS';
 
-export type NtpMode = 'automatic' | 'manual';
+export type EnrollmentCredentialsSource = 'existing' | 'new';
 
-export type EnrollmentCredentialMode = 'token' | 'username_password';
-
-export type EnrollmentServiceMode = 'provision' | 'connectivity_only' | 'skipped';
+export type AuthenticationMethod = 'token' | 'username_password';
 
 export type EnrollmentOutcome = 'idle' | 'running' | 'success' | 'failure';
 
 export type EnrollmentFailureCode = 2 | 3 | 4;
 
+export type LabelKeyValue = {
+  key: string;
+  value: string;
+};
+
+export type LabelMapping = {
+  key: string;
+  systemInfoField: string;
+};
+
 export type CockpitOnsiteSetupValues = {
-  serviceName: string;
-  hostname: string;
-  labels: string;
-  description: string;
-  networkConnectionType: NetworkConnectionType;
-  ipv4Mode: Ipv4Mode;
-  ipv4Address: string;
-  dnsServers: string;
-  ipv4Gateway: string;
-  ipv6Mode: Ipv6Mode;
-  ipv6Address: string;
-  ipv6Dns: string;
+  selectedNetworkInterface: string;
   vlanId: string;
-  wifiSsid: string;
-  wifiPassword: string;
-  ntpMode: NtpMode;
-  ntpServer: string;
-  httpProxies: string[];
+  ipv4Mode: Ipv4Mode;
+  ipv4AutoDns: boolean;
+  ipv6Mode: Ipv6Mode;
+  ipv6AutoDns: boolean;
+  ntpServerHostname: string;
+  proxyProtocol: ProxyProtocol;
+  proxyHostname: string;
+  proxyPort: string;
   proxyUsername: string;
   proxyPassword: string;
-  flightControlEndpoint: string;
-  enrollmentServiceMode: EnrollmentServiceMode;
-  enrollmentCredentialMode: EnrollmentCredentialMode;
+  proxyNoProxy: string;
+  flightControlEnrollmentEnabled: boolean;
+  enrollmentCredentialsSource: EnrollmentCredentialsSource;
+  serviceEndpoint: string;
+  authenticationMethod: AuthenticationMethod;
   flightControlToken: string;
   flightControlUsername: string;
   flightControlPassword: string;
-  /** True when production network uses the same NIC as the operator browser session. */
-  singleNicSetup: boolean;
-  singleNicWarningAcknowledged: boolean;
+  hostname: string;
+  deviceAlias: string;
+  customLabels: LabelKeyValue[];
+  labelMappings: LabelMapping[];
 };
 
 export const defaultCockpitOnsiteSetupValues: CockpitOnsiteSetupValues = {
-  serviceName: 'Flight Control',
-  hostname: 'localhost',
-  labels: '',
-  description: '',
-  networkConnectionType: 'ethernet',
-  ipv4Mode: 'static',
-  ipv4Address: '192.168.1.50',
-  dnsServers: '192.168.1.1',
-  ipv4Gateway: '192.168.1.1',
-  ipv6Mode: 'auto',
-  ipv6Address: '',
-  ipv6Dns: '',
+  selectedNetworkInterface: 'eth0',
   vlanId: '',
-  wifiSsid: '',
-  wifiPassword: '',
-  ntpMode: 'automatic',
-  ntpServer: '',
-  httpProxies: [''],
+  ipv4Mode: 'dhcpv4',
+  ipv4AutoDns: false,
+  ipv6Mode: 'disabled',
+  ipv6AutoDns: false,
+  ntpServerHostname: 'pool.ntp.org',
+  proxyProtocol: 'HTTP',
+  proxyHostname: '',
+  proxyPort: '',
   proxyUsername: '',
   proxyPassword: '',
-  flightControlEndpoint: '',
-  enrollmentServiceMode: 'provision',
-  enrollmentCredentialMode: 'token',
+  proxyNoProxy: 'localhost,127.0.0.1,::1',
+  flightControlEnrollmentEnabled: true,
+  enrollmentCredentialsSource: 'existing',
+  serviceEndpoint: '',
+  authenticationMethod: 'token',
   flightControlToken: '',
   flightControlUsername: '',
   flightControlPassword: '',
-  singleNicSetup: false,
-  singleNicWarningAcknowledged: false,
+  hostname: '',
+  deviceAlias: '',
+  customLabels: [{ key: '', value: '' }],
+  labelMappings: [{ key: '', systemInfoField: '' }],
 };

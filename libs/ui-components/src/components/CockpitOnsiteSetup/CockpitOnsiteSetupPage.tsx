@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Bullseye, Page, PageSection, Spinner } from '@patternfly/react-core';
+import { Bullseye, Spinner } from '@patternfly/react-core';
 import { Navigate } from 'react-router-dom';
 
+import { CockpitInterfaceShell } from '../CockpitShell';
 import { useFetch } from '../../hooks/useFetch';
 import { UX_BRANCH_EDM_3710, UX_BRANCH_PARAM, useUxBranch } from '../../hooks/useUxBranch';
 import { isDevMockApi } from '../../utils/devMock';
@@ -48,16 +49,9 @@ const CockpitOnsiteSetupPage = () => {
   }
 
   return (
-    <Page className="fctl-cockpit-onsite-setup-page">
-      <PageSection
-        variant="secondary"
-        hasBodyWrapper={false}
-        type="wizard"
-        className="fctl-cockpit-onsite-setup-content"
-      >
-        <CockpitOnsiteSetupWizard onCancel={handleDismiss} onEnrollmentSuccess={handleEnrollmentSuccess} />
-      </PageSection>
-    </Page>
+    <CockpitInterfaceShell pageClassName="fctl-cockpit-onsite-setup-page">
+      <CockpitOnsiteSetupWizard onCancel={handleDismiss} onEnrollmentSuccess={handleEnrollmentSuccess} />
+    </CockpitInterfaceShell>
   );
 };
 

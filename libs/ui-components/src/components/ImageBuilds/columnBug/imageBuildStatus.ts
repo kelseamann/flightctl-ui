@@ -1,17 +1,21 @@
-import type { CatalogSyncStatus } from './types';
+import type { CatalogSyncStatus, ExportStepDisplay } from './types';
 
 export function isEligibleToPublish(
   status: string,
   pipelineStatus: string,
   catalogSync: CatalogSyncStatus,
   includeCatalogStep = true,
+  exportStepDisplay: ExportStepDisplay = 'default',
 ): boolean {
   if (!includeCatalogStep) {
     return false;
   }
+  const pipelineReady =
+    pipelineStatus === 'Complete' ||
+    (exportStepDisplay === 'warning' && status === 'Complete' && pipelineStatus === 'Failed');
   return (
     status === 'Complete' &&
-    pipelineStatus === 'Complete' &&
+    pipelineReady &&
     catalogSync !== 'published' &&
     catalogSync !== 'publishing' &&
     catalogSync !== 'auto_pushing'
@@ -24,17 +28,18 @@ export function rowActionLabel(
   catalogSync: CatalogSyncStatus,
   canPublish: boolean,
   includeCatalogStep = true,
+  exportStepDisplay: ExportStepDisplay = 'default',
 ): string | null {
   if (status === 'Queued') {
     return null;
   }
   if (status === 'Failed') {
-    return 'Retry build';
+    return 'See failure message';
   }
   if (pipelineStatus === 'Queued') {
     return null;
   }
-  if (pipelineStatus === 'Failed') {
+  if (pipelineStatus === 'Failed' && exportStepDisplay !== 'warning') {
     return 'Retry export';
   }
   if (!includeCatalogStep) {
@@ -62,6 +67,7 @@ export function stageHelperText(
   canPublish: boolean,
   exportStageLabel?: string,
   includeCatalogStep = true,
+  exportStepDisplay: ExportStepDisplay = 'default',
 ): string | null {
   if (status === 'Queued') {
     return 'Building';
@@ -69,10 +75,31 @@ export function stageHelperText(
   if (status === 'Failed') {
     return 'Build failed';
   }
-  if (pipelineStatus === 'Queued') {
+  if (exportStepDisplay === 'skipped' && status === 'Complete') {
+    if (canPublish) {
+      return 'Ready to push to Catalog';
+    }
+    if (catalogSync === 'published') {
+      return 'All artifacts in Catalog';
+    }
+    return 'Export skipped';
+  }
+  if (exportStepDisplay === 'warning' && status === 'Complete') {
+    if (pipelineStatus === 'Queued') {
+      return exportStageLabel ?? 'Exporting with warnings';
+    }
+    if (canPublish) {
+      return 'Ready to push to Catalog';
+    }
+    if (pipelineStatus === 'Failed') {
+      return 'Export failed';
+    }
+    return 'Export completed with warnings';
+  }
+  if (exportStepDisplay === 'default' && pipelineStatus === 'Queued') {
     return exportStageLabel ?? 'Exporting';
   }
-  if (pipelineStatus === 'Failed') {
+  if (exportStepDisplay === 'default' && pipelineStatus === 'Failed') {
     return 'Export failed';
   }
   if (!includeCatalogStep) {

@@ -43,3 +43,9 @@
   font-size: var(--pf-t--global--font--size--body--sm, 12px);
   white-space: nowrap;
 }
+
+.rhem-export-step-skipped-trigger {
+  cursor: default;
+  display: inline-flex;
+  line-height: 0;
+}

@@ -63,6 +63,7 @@ export function getFullWidthWizardCaptureCss({
     .pf-v6-c-wizard__nav,
     .pf-v6-c-wizard__footer,
     .pf-v6-c-wizard__footer-wrapper,
+    .fctl-cockpit-interface-shell,
     .fctl-cockpit-onsite-setup-page,
     .fctl-cockpit-onsite-setup-content {
       width: 100% !important;
@@ -94,11 +95,8 @@ export function getFullWidthWizardCaptureCss({
       margin-top: auto !important;
       width: 100% !important;
     }
-    .fctl-cockpit-onsite-setup-page,
-    .fctl-cockpit-onsite-setup-page .pf-v6-c-page__main,
-    .fctl-cockpit-onsite-setup-page .pf-v6-c-page__main-section,
-    .fctl-cockpit-onsite-setup-content,
-    .fctl-cockpit-onsite-setup-page .pf-v6-c-wizard {
+    .fctl-cockpit-interface-shell,
+    .fctl-cockpit-interface-shell .pf-v6-c-wizard {
       flex: 1 1 auto;
       display: flex !important;
       flex-direction: column;
@@ -134,7 +132,7 @@ export async function setWizardCaptureViewport(page, {
  */
 export async function mountWizardCaptureRoot(page, {
   rootId = 'figma-wizard-capture-root',
-  wizardSelector = '.fctl-cockpit-onsite-setup-page',
+  wizardSelector = '.fctl-cockpit-interface-shell',
   contextBannerId,
   contextBannerText,
   contextBannerCss = 'padding: 12px 24px; background: #0066cc; color: #fff; font: 600 16px/1.4 RedHatText, Overpass, sans-serif; text-align: center;',

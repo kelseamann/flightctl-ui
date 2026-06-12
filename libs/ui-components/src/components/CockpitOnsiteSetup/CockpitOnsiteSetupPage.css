@@ -1,24 +1,5 @@
-.fctl-cockpit-onsite-setup-page {
-  --pf-v6-c-page--BackgroundColor: var(--pf-t--global--background--color--secondary--default);
+.fctl-cockpit-onsite-setup-page.fctl-cockpit-interface-shell {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.fctl-cockpit-onsite-setup-page .pf-v6-c-page__main,
-.fctl-cockpit-onsite-setup-page .pf-v6-c-page__main-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.fctl-cockpit-onsite-setup-page .fctl-cockpit-onsite-setup-content {
-  padding-block-start: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
 }
 
 .fctl-cockpit-onsite-setup-page .pf-v6-c-wizard {
@@ -28,34 +9,3 @@
   min-height: 0;
 }
 
-.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard__main {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  min-height: 0;
-}
-
-.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard__nav {
-  align-self: stretch;
-}
-
-.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard__main-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard__footer,
-.fctl-cockpit-onsite-setup-page .pf-v6-c-wizard__footer-wrapper {
-  margin-top: auto;
-}
-
-.fctl-cockpit-network-detected__option + .fctl-cockpit-network-detected__option {
-  margin-block-start: var(--pf-t--global--spacer--xs);
-}
-
-.fctl-cockpit-network-detected__description {
-  margin-block-start: var(--pf-t--global--spacer--xs);
-  padding-inline-start: calc(var(--pf-t--global--spacer--lg) + var(--pf-t--global--spacer--sm));
-}

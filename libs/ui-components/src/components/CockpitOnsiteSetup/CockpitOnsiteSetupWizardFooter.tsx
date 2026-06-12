@@ -15,7 +15,7 @@ import { isDevMockApi } from '../../utils/devMock';
 import { COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER } from './cockpitOnsiteSetupConstants';
 import type { EnrollmentOutcome } from './types';
 
-const STEP_ORDER = COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER;
+const NAV_STEP_ORDER = COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER;
 
 type CockpitOnsiteSetupWizardFooterProps = {
   isStepValid: (stepId: string) => boolean;
@@ -35,9 +35,9 @@ const CockpitOnsiteSetupWizardFooter = ({
   const { t } = useTranslation();
   const { goToNextStep, goToPrevStep, goToStepById, activeStep } = useWizardContext();
   const stepId = String(activeStep.id);
-  const stepIndex = STEP_ORDER.indexOf(stepId as (typeof STEP_ORDER)[number]);
+  const stepIndex = NAV_STEP_ORDER.indexOf(stepId as (typeof NAV_STEP_ORDER)[number]);
   const isFirst = stepIndex === 0;
-  const isReview = stepId === 'review';
+  const isLabels = stepId === 'labels';
   const isConfirmation = stepId === 'confirmation';
   const canAdvance = isDevMockApi() || isStepValid(stepId);
 
@@ -68,10 +68,10 @@ const CockpitOnsiteSetupWizardFooter = ({
     return null;
   }
 
-  const primaryLabel = isReview ? t('Apply and enroll') : t('Next step');
+  const primaryLabel = t('Next step');
 
   const onPrimary = () => {
-    if (isReview) {
+    if (isLabels) {
       onStartEnrollment();
       goToStepById('confirmation');
       return;
@@ -79,7 +79,7 @@ const CockpitOnsiteSetupWizardFooter = ({
     goToNextStep();
   };
 
-  const primaryDisabled = !isReview && !canAdvance;
+  const primaryDisabled = !canAdvance;
 
   return (
     <WizardFooterWrapper>

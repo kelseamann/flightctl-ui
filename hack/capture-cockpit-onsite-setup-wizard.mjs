@@ -13,54 +13,41 @@ const BASE = 'http://localhost:9000';
 const WIZARD_URL = `${BASE}/onsite-setup?branch=EDM-3710`;
 const CAPTURE_SCRIPT = 'https://mcp.figma.com/mcp/html-to-design/capture.js';
 const CAPTURE_ROOT_ID = 'figma-wizard-capture-root';
-const CONTEXT_BANNER_ID = 'figma-cockpit-context-banner';
 
 const START_INDEX = Number(process.argv[2] || 0);
 const CAPTURE_IDS = process.argv.slice(3).filter(Boolean);
 
 const ALL_STEPS = [
   {
-    label: '01 — Onboarding entry',
+    label: '02 — Network',
+    captureHeight: 2050,
     prepare: async (page) => {
-      await page.getByText("Let's begin first-boot device onboarding").first().waitFor({ timeout: 30000 });
+      await goToWizardStep(page, 'Network');
+      await page.getByText('Choose a network interface to use for onboarding').waitFor({ timeout: 15000 });
+      await page.getByLabel('DHCPv4').waitFor({ timeout: 15000 });
     },
   },
   {
-    label: '02 — General information',
+    label: '03 — Enrollment',
     prepare: async (page) => {
-      await clickNextStep(page);
-      await page.getByRole('heading', { name: 'General information' }).waitFor({ timeout: 15000 });
+      await goToWizardStep(page, 'Enrollment');
+      await page.getByRole('heading', { name: 'Enrollment' }).waitFor({ timeout: 15000 });
     },
   },
   {
-    label: '03 — Network configurations',
-    captureHeight: 950,
+    label: '04 — Device labels',
     prepare: async (page) => {
-      await goToWizardStep(page, 'Network configurations');
-      await page.getByRole('heading', { name: 'Network configurations' }).waitFor({ timeout: 15000 });
+      await goToWizardStep(page, 'Device labels');
+      await page.getByRole('heading', { name: 'Device labels' }).waitFor({ timeout: 15000 });
     },
   },
   {
-    label: '04 — Service enrollment',
+    label: '05 — Apply and enroll',
     prepare: async (page) => {
-      await goToWizardStep(page, 'Service enrollment');
-      await page.getByRole('heading', { name: 'Service enrollment' }).waitFor({ timeout: 15000 });
-    },
-  },
-  {
-    label: '05 — Review and enroll',
-    prepare: async (page) => {
-      await goToWizardStep(page, 'Review and enroll');
-      await page.getByRole('heading', { name: 'Review and enroll' }).waitFor({ timeout: 15000 });
-    },
-  },
-  {
-    label: '06 — Confirmation (enrolling)',
-    prepare: async (page) => {
-      await goToWizardStep(page, 'Service enrollment');
+      await goToWizardStep(page, 'Enrollment');
       await page.locator('#onsite-fc-token').fill('mock-enrollment-token');
-      await goToWizardStep(page, 'Review and enroll');
-      await page.getByRole('button', { name: 'Apply and enroll' }).click();
+      await goToWizardStep(page, 'Device labels');
+      await page.getByRole('button', { name: 'Next step' }).click();
       await page.getByText('Onboarding complete').first().waitFor({ timeout: 30000 });
       await page.getByRole('button', { name: 'Go to Devices pending approval' }).waitFor({ timeout: 30000 });
     },
@@ -125,15 +112,56 @@ async function prepareCaptureRoot(page, captureHeight) {
     rootId: CAPTURE_ROOT_ID,
     frameWidth: FIGMA_WIZARD_FRAME_WIDTH,
     frameHeight: captureHeight,
-    contextBannerId: CONTEXT_BANNER_ID,
-    contextBannerCss:
-      'padding: 12px 24px; background: #0066cc; color: #fff; font: 600 16px/1.4 RedHatText, Overpass, sans-serif; text-align: center;',
   });
+  if (captureHeight > FIGMA_WIZARD_FRAME_HEIGHT) {
+    await page.addStyleTag({
+      content: `
+        .fctl-cockpit-onsite-setup-page,
+        .fctl-cockpit-onsite-setup-page .pf-v6-c-page__main,
+        .fctl-cockpit-onsite-setup-page .pf-v6-c-page__main-section,
+        .fctl-cockpit-onsite-setup-content,
+        .fctl-cockpit-interface-shell,
+        .pf-v6-c-wizard,
+        .pf-v6-c-wizard__outer-wrap,
+        .pf-v6-c-wizard__inner-wrap {
+          height: auto !important;
+          min-height: 0 !important;
+          overflow: visible !important;
+        }
+        .pf-v6-c-wizard__toggle {
+          display: flex !important;
+          flex-direction: row !important;
+          align-items: flex-start !important;
+          width: 100% !important;
+          height: auto !important;
+        }
+        .pf-v6-c-wizard__main {
+          flex-direction: row !important;
+          align-items: flex-start !important;
+          height: auto !important;
+        }
+        .pf-v6-c-wizard__nav {
+          width: 250px !important;
+          min-width: 250px !important;
+          max-width: 250px !important;
+          flex: 0 0 250px !important;
+          position: relative !important;
+          height: auto !important;
+          align-self: stretch !important;
+        }
+        .pf-v6-c-wizard__main-body {
+          flex: 1 1 auto !important;
+          width: auto !important;
+          min-width: 0 !important;
+          height: auto !important;
+          overflow: visible !important;
+        }
+      `,
+    });
+  }
   await mountWizardCaptureRoot(page, {
     rootId: CAPTURE_ROOT_ID,
-    wizardSelector: '.fctl-cockpit-onsite-setup-page',
-    contextBannerId: CONTEXT_BANNER_ID,
-    contextBannerText: 'Happens in Cockpit',
+    wizardSelector: '.fctl-cockpit-interface-shell',
   });
   await setWizardCaptureViewport(page, {
     rootId: CAPTURE_ROOT_ID,
@@ -156,13 +184,8 @@ async function goToWizardStep(page, stepName) {
   await page.waitForTimeout(600);
 }
 
-async function clickNextStep(page) {
-  await page.getByRole('button', { name: 'Next step' }).click({ timeout: 15000 });
-  await page.waitForTimeout(600);
-}
-
 for (const step of STEP_CAPTURES) {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: true, channel: 'chrome' });
   const page = await browser.newPage({ viewport: { width: FIGMA_WIZARD_FRAME_WIDTH, height: FIGMA_WIZARD_FRAME_HEIGHT } });
   try {
     await bootstrapPage(page);

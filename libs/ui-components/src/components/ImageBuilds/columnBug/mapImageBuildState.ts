@@ -12,7 +12,8 @@ import {
   getImageExportStatusReason,
   isImageExportActiveReason,
 } from '../../../utils/imageBuilds';
-import type { BuildStatus, CatalogSyncStatus } from './types';
+import type { BuildStatus, CatalogSyncStatus, ExportStepDisplay } from './types';
+import { UX_EXPORT_STEP_LABEL } from './types';
 
 const mapBuildStatus = (reason: ImageBuildConditionReason): BuildStatus => {
   if (reason === ImageBuildConditionReason.ImageBuildConditionReasonCompleted) {
@@ -78,11 +79,29 @@ const mapCatalogSync = (latestPromotion?: ImagePromotion): CatalogSyncStatus => 
   }
 };
 
+const mapExportStepDisplay = (imageBuild: ImageBuildWithExports): ExportStepDisplay => {
+  const label = imageBuild.metadata?.labels?.[UX_EXPORT_STEP_LABEL];
+  if (label === 'skipped' || label === 'warning') {
+    return label;
+  }
+
+  const buildStatus = mapBuildStatus(getImageBuildStatusReason(imageBuild));
+  const exports = imageBuild.imageExports.filter((imageExport): imageExport is NonNullable<typeof imageExport> =>
+    Boolean(imageExport),
+  );
+  if (exports.length === 0 && buildStatus === 'Complete') {
+    return 'skipped';
+  }
+
+  return 'default';
+};
+
 export type ColumnBugRowState = {
   buildStatus: BuildStatus;
   pipelineStatus: BuildStatus;
   catalogSync: CatalogSyncStatus;
-  pipelineSteps: 2 | 3;
+  exportStepDisplay: ExportStepDisplay;
+  showCatalogStep: boolean;
 };
 
 export const mapImageBuildToColumnBugState = (
@@ -93,5 +112,6 @@ export const mapImageBuildToColumnBugState = (
   buildStatus: mapBuildStatus(getImageBuildStatusReason(imageBuild)),
   pipelineStatus: mapPipelineStatus(imageBuild),
   catalogSync: mapCatalogSync(latestPromotion),
-  pipelineSteps: includeCatalogStep ? 3 : 2,
+  exportStepDisplay: mapExportStepDisplay(imageBuild),
+  showCatalogStep: includeCatalogStep,
 });

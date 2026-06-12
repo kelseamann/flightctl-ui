@@ -1,6 +1,6 @@
-import type { BuildStatus, CatalogSyncStatus } from './types';
+import type { BuildStatus, CatalogSyncStatus, ExportStepDisplay } from './types';
 
-export type StepVariant = 'success' | 'info' | 'pending' | 'danger';
+export type StepVariant = 'success' | 'info' | 'pending' | 'danger' | 'warning';
 
 export type StepState = {
   variant: StepVariant;
@@ -17,7 +17,25 @@ export function buildStepState(status: BuildStatus): StepState {
   return { variant: 'success' };
 }
 
-export function exportStepState(buildStatus: BuildStatus, pipelineStatus: BuildStatus): StepState {
+export function exportStepState(
+  buildStatus: BuildStatus,
+  pipelineStatus: BuildStatus,
+  exportStepDisplay: ExportStepDisplay = 'default',
+): StepState {
+  if (exportStepDisplay === 'skipped') {
+    if (buildStatus !== 'Complete') {
+      return { variant: 'pending' };
+    }
+    return { variant: 'pending' };
+  }
+
+  if (exportStepDisplay === 'warning') {
+    if (buildStatus !== 'Complete') {
+      return { variant: 'pending' };
+    }
+    return { variant: 'warning', isCurrent: pipelineStatus === 'Queued' };
+  }
+
   if (buildStatus !== 'Complete') {
     return { variant: 'pending' };
   }
@@ -35,13 +53,19 @@ export function catalogStepState(
   pipelineStatus: BuildStatus,
   catalogSync: CatalogSyncStatus,
   canPublish: boolean,
+  exportStepDisplay: ExportStepDisplay = 'default',
 ): StepState {
   if (buildStatus !== 'Complete') {
     return { variant: 'pending' };
   }
-  if (pipelineStatus !== 'Complete') {
+
+  const pipelineReady =
+    exportStepDisplay === 'skipped' || exportStepDisplay === 'warning' || pipelineStatus === 'Complete';
+
+  if (!pipelineReady) {
     return { variant: 'pending' };
   }
+
   if (catalogSync === 'stale') {
     return { variant: 'info', isCurrent: true };
   }
@@ -65,10 +89,11 @@ export function getPipelineStepStates(
   pipelineStatus: BuildStatus,
   catalogSync: CatalogSyncStatus,
   canPublish: boolean,
+  exportStepDisplay: ExportStepDisplay = 'default',
 ) {
   return {
     build: buildStepState(buildStatus),
-    export: exportStepState(buildStatus, pipelineStatus),
-    catalog: catalogStepState(buildStatus, pipelineStatus, catalogSync, canPublish),
+    export: exportStepState(buildStatus, pipelineStatus, exportStepDisplay),
+    catalog: catalogStepState(buildStatus, pipelineStatus, catalogSync, canPublish, exportStepDisplay),
   };
 }

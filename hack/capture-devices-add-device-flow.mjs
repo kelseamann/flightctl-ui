@@ -70,6 +70,23 @@ async function ensureCaptureScript(page) {
     });
 }
 
+async function safeEvaluate(page, fn, arg, { retries = 3 } = {}) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await page.waitForLoadState('domcontentloaded');
+      return await page.evaluate(fn, arg);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      const retriable =
+        message.includes('Execution context was destroyed') || message.includes('navigation');
+      if (!retriable || attempt === retries) {
+        throw error;
+      }
+      await page.waitForTimeout(1000);
+    }
+  }
+}
+
 async function prepareDevicesCaptureRoot(page) {
   await page.addStyleTag({
     content: `
@@ -83,12 +100,19 @@ async function prepareDevicesCaptureRoot(page) {
       }
       #${CAPTURE_ROOT_ID} {
         box-sizing: border-box;
+        position: relative;
         width: ${FIGMA_WIZARD_FRAME_WIDTH}px !important;
         min-width: ${FIGMA_WIZARD_FRAME_WIDTH}px !important;
         height: ${FIGMA_WIZARD_FRAME_HEIGHT}px;
         min-height: ${FIGMA_WIZARD_FRAME_HEIGHT}px;
-        overflow: hidden;
+        overflow: visible;
         background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+      }
+      #${CAPTURE_ROOT_ID} .pf-v6-c-backdrop {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
       }
       #primary-app-container,
       .pf-v6-c-page,
@@ -103,7 +127,8 @@ async function prepareDevicesCaptureRoot(page) {
     `,
   });
 
-  await page.evaluate(
+  await safeEvaluate(
+    page,
     ({ rootId }) => {
       document.getElementById(rootId)?.remove();
       const appRoot = document.querySelector('#primary-app-container') || document.body.firstElementChild;
@@ -123,8 +148,34 @@ async function prepareDevicesCaptureRoot(page) {
   await page.waitForTimeout(400);
 }
 
+async function moveModalIntoCaptureRoot(page) {
+  await safeEvaluate(
+    page,
+    ({ rootId }) => {
+      const root = document.getElementById(rootId);
+      if (!root) {
+        throw new Error(`Capture root not found: ${rootId}`);
+      }
+      for (const selector of ['.pf-v6-c-backdrop', '[role="dialog"]']) {
+        for (const node of document.querySelectorAll(selector)) {
+          if (!root.contains(node)) {
+            root.appendChild(node);
+          }
+        }
+      }
+      const dialog = root.querySelector('[role="dialog"]');
+      if (!dialog) {
+        throw new Error('Add devices modal dialog not found in capture root');
+      }
+    },
+    { rootId: CAPTURE_ROOT_ID },
+  );
+}
+
 async function capturePage(page, captureId) {
+  await page.waitForLoadState('networkidle').catch(() => {});
   await prepareDevicesCaptureRoot(page);
+  await moveModalIntoCaptureRoot(page);
   await ensureCaptureScript(page);
   await page.waitForTimeout(1500);
   await submitFigmaCapture(page, { captureId, selector: `#${CAPTURE_ROOT_ID}` });
@@ -132,7 +183,7 @@ async function capturePage(page, captureId) {
 }
 
 async function withPage({ emptyEnrollmentRequests }, run) {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: true, channel: 'chrome' });
   const page = await browser.newPage({ viewport: { width: FIGMA_WIZARD_FRAME_WIDTH, height: FIGMA_WIZARD_FRAME_HEIGHT } });
   try {
     await setupMockApi(page, { emptyEnrollmentRequests });
@@ -155,7 +206,7 @@ if (mode === 'modal' || mode === 'both-tabs' || mode === 'both') {
   await withPage({ emptyEnrollmentRequests: true }, async (page) => {
     await page.getByRole('button', { name: 'Add devices' }).first().click();
     await page.getByRole('dialog').waitFor({ timeout: 30000 });
-    await page.getByText('Before you go onsite', { exact: true }).waitFor({ timeout: 30000 });
+    await page.getByText('Where can I get my token?').waitFor({ timeout: 30000 });
     await page.getByRole('tab', { name: 'Cockpit onsite onboarding' }).waitFor({ timeout: 30000 });
     await capturePage(page, captures.addDeviceModal);
   });

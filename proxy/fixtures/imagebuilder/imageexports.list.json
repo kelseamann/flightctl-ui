@@ -28,6 +28,58 @@
           }
         ]
       }
+    },
+    {
+      "apiVersion": "v1alpha1",
+      "kind": "ImageExport",
+      "metadata": {
+        "name": "demo-build-export-warning-iso",
+        "creationTimestamp": "2024-04-13T11:00:00Z"
+      },
+      "spec": {
+        "source": {
+          "type": "imageBuild",
+          "imageBuildRef": "demo-build-export-warning"
+        },
+        "format": "iso"
+      },
+      "status": {
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "False",
+            "lastTransitionTime": "2024-04-13T11:15:00Z",
+            "message": "ISO export failed — conversion error",
+            "reason": "Failed"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1alpha1",
+      "kind": "ImageExport",
+      "metadata": {
+        "name": "demo-build-export-warning-qcow",
+        "creationTimestamp": "2024-04-13T11:20:00Z"
+      },
+      "spec": {
+        "source": {
+          "type": "imageBuild",
+          "imageBuildRef": "demo-build-export-warning"
+        },
+        "format": "qcow2"
+      },
+      "status": {
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True",
+            "lastTransitionTime": "2024-04-13T11:30:00Z",
+            "message": "Export completed successfully",
+            "reason": "Completed"
+          }
+        ]
+      }
     }
   ]
 }

@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import type { BuildStatus, CatalogSyncStatus } from './types';
+import { useTranslation } from '../../../hooks/useTranslation';
+import type { BuildStatus, CatalogSyncStatus, ExportStepDisplay } from './types';
 import { isEligibleToPublish, rowActionLabel, stageHelperText } from './imageBuildStatus';
 import ImageBuildProgressStepper from './ImageBuildProgressStepper';
 import ImageBuildRowActions from './ImageBuildRowActions';
@@ -11,10 +12,12 @@ export type ImageBuildStatusCellProps = {
   pipelineStatus: BuildStatus;
   catalogSync: CatalogSyncStatus;
   exportStageLabel?: string;
-  pipelineSteps?: 2 | 3;
+  exportStepDisplay?: ExportStepDisplay;
+  showCatalogStep?: boolean;
   onPushToCatalog?: () => void;
   onOpenCatalog?: () => void;
   onRetry?: () => void;
+  onSeeDetails?: () => void;
   variant?: 'status' | 'actions';
 };
 
@@ -24,22 +27,40 @@ const ImageBuildStatusCell = ({
   pipelineStatus,
   catalogSync,
   exportStageLabel,
-  pipelineSteps = 3,
+  exportStepDisplay = 'default',
+  showCatalogStep = true,
   onPushToCatalog,
   onOpenCatalog,
   onRetry,
+  onSeeDetails,
   variant = 'status',
 }: ImageBuildStatusCellProps) => {
-  const includeCatalogStep = pipelineSteps === 3;
-  const canPublish = isEligibleToPublish(buildStatus, pipelineStatus, catalogSync, includeCatalogStep);
-  const actionLabel = rowActionLabel(buildStatus, pipelineStatus, catalogSync, canPublish, includeCatalogStep);
+  const { t } = useTranslation();
+  const canPublish = isEligibleToPublish(
+    buildStatus,
+    pipelineStatus,
+    catalogSync,
+    showCatalogStep,
+    exportStepDisplay,
+  );
+  const rawActionLabel = rowActionLabel(
+    buildStatus,
+    pipelineStatus,
+    catalogSync,
+    canPublish,
+    showCatalogStep,
+    exportStepDisplay,
+  );
+  const actionLabel =
+    rawActionLabel === 'See failure message' ? t('See failure message') : rawActionLabel;
   const statusNote = stageHelperText(
     buildStatus,
     pipelineStatus,
     catalogSync,
     canPublish,
     exportStageLabel,
-    includeCatalogStep,
+    showCatalogStep,
+    exportStepDisplay,
   );
   const showStepper = variant === 'status';
   const showActions = variant === 'actions';
@@ -54,7 +75,7 @@ const ImageBuildStatusCell = ({
             pipelineStatus={pipelineStatus}
             catalogSync={catalogSync}
             canPublish={canPublish}
-            pipelineSteps={pipelineSteps}
+            exportStepDisplay={exportStepDisplay}
           />
           {statusNote && <span className="rhem-status-note">{statusNote}</span>}
         </>
@@ -64,13 +85,15 @@ const ImageBuildStatusCell = ({
           buildName={buildName}
           actionLabel={actionLabel}
           onAction={
-            actionLabel.startsWith('Retry')
-              ? onRetry
-              : canPublish
-                ? onPushToCatalog
-                : catalogSync === 'published' || catalogSync === 'auto_pushing'
-                  ? onOpenCatalog
-                  : undefined
+            buildStatus === 'Failed'
+              ? onSeeDetails
+              : actionLabel.startsWith('Retry')
+                ? onRetry
+                : canPublish
+                  ? onPushToCatalog
+                  : catalogSync === 'published' || catalogSync === 'auto_pushing'
+                    ? onOpenCatalog
+                    : undefined
           }
           showExternalLinkIcon={catalogSync === 'published' || catalogSync === 'auto_pushing'}
         />

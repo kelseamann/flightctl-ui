@@ -97,12 +97,145 @@
             "type": "Ready",
             "status": "False",
             "lastTransitionTime": "2024-04-11T09:15:00Z",
-            "message": "Build in progress",
-            "reason": "Building"
+            "message": "Root filesystem build failed — disk space exhausted. Free space on the build host or reduce image size, then start a new build.",
+            "reason": "Failed"
           }
         ]
       },
       "imageexports": []
+    },
+    {
+      "apiVersion": "v1alpha1",
+      "kind": "ImageBuild",
+      "metadata": {
+        "name": "demo-build-catalog",
+        "creationTimestamp": "2024-04-12T14:00:00Z",
+        "labels": {
+          "ux.export-step": "skipped"
+        }
+      },
+      "spec": {
+        "source": {
+          "repository": "oci-registry",
+          "imageName": "example/base",
+          "imageTag": "catalog"
+        },
+        "destination": {
+          "repository": "oci-registry",
+          "imageName": "example/catalog-output",
+          "imageTag": "1.0"
+        },
+        "binding": {
+          "type": "early"
+        }
+      },
+      "status": {
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True",
+            "lastTransitionTime": "2024-04-12T14:30:00Z",
+            "message": "Build completed successfully",
+            "reason": "Completed"
+          }
+        ],
+        "imageReference": "quay.io/example/catalog-output:1.0",
+        "architecture": "amd64"
+      },
+      "imageexports": []
+    },
+    {
+      "apiVersion": "v1alpha1",
+      "kind": "ImageBuild",
+      "metadata": {
+        "name": "demo-build-export-warning",
+        "creationTimestamp": "2024-04-13T10:00:00Z",
+        "labels": {
+          "ux.export-step": "warning"
+        }
+      },
+      "spec": {
+        "source": {
+          "repository": "oci-registry",
+          "imageName": "example/base",
+          "imageTag": "warning"
+        },
+        "destination": {
+          "repository": "oci-registry",
+          "imageName": "example/warning-output",
+          "imageTag": "1.0"
+        },
+        "binding": {
+          "type": "early"
+        }
+      },
+      "status": {
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True",
+            "lastTransitionTime": "2024-04-13T10:30:00Z",
+            "message": "Build completed successfully",
+            "reason": "Completed"
+          }
+        ],
+        "imageReference": "quay.io/example/warning-output:1.0",
+        "architecture": "amd64"
+      },
+      "imageexports": [
+        {
+          "apiVersion": "v1alpha1",
+          "kind": "ImageExport",
+          "metadata": {
+            "name": "demo-build-export-warning-iso",
+            "creationTimestamp": "2024-04-13T11:00:00Z"
+          },
+          "spec": {
+            "source": {
+              "type": "imageBuild",
+              "imageBuildRef": "demo-build-export-warning"
+            },
+            "format": "iso"
+          },
+          "status": {
+            "conditions": [
+              {
+                "type": "Ready",
+                "status": "False",
+                "lastTransitionTime": "2024-04-13T11:15:00Z",
+                "message": "ISO export failed — conversion error",
+                "reason": "Failed"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "v1alpha1",
+          "kind": "ImageExport",
+          "metadata": {
+            "name": "demo-build-export-warning-qcow",
+            "creationTimestamp": "2024-04-13T11:20:00Z"
+          },
+          "spec": {
+            "source": {
+              "type": "imageBuild",
+              "imageBuildRef": "demo-build-export-warning"
+            },
+            "format": "qcow2"
+          },
+          "status": {
+            "conditions": [
+              {
+                "type": "Ready",
+                "status": "True",
+                "lastTransitionTime": "2024-04-13T11:30:00Z",
+                "message": "Export completed successfully",
+                "reason": "Completed"
+              }
+            ]
+          }
+        }
+      ]
     }
   ]
 }

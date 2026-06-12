@@ -4,7 +4,6 @@ import TimesCircleIcon from '@patternfly/react-icons/dist/js/icons/times-circle-
 
 import { useTranslation } from '../../../hooks/useTranslation';
 import { isDevMockApi } from '../../../utils/devMock';
-import { getEnrollmentFailureMessage } from '../cockpitOnsiteSetupSummary';
 import CockpitOnsiteSetupEnrollmentComplete from '../CockpitOnsiteSetupEnrollmentComplete';
 import type { EnrollmentFailureCode } from '../types';
 import type { CockpitOnsiteSetupStepProps } from './CockpitOnsiteSetupStepProps';
@@ -17,10 +16,8 @@ type CockpitOnsiteSetupConfirmationStepProps = CockpitOnsiteSetupStepProps & {
 };
 
 const CockpitOnsiteSetupConfirmationStep = ({
-  values,
   enrollmentOutcome,
   deviceConnected,
-  enrollmentFailureCode,
   onEnrollmentComplete,
 }: CockpitOnsiteSetupConfirmationStepProps) => {
   const { t } = useTranslation();
@@ -49,17 +46,8 @@ const CockpitOnsiteSetupConfirmationStep = ({
           </StackItem>
           <StackItem className="pf-v6-u-text-align-center">
             <Title headingLevel="h1" size="2xl">
-              {values.enrollmentServiceMode === 'connectivity_only'
-                ? t('Verifying connectivity…')
-                : t('Applying configuration…')}
+              {t('Applying configuration…')}
             </Title>
-            <p className="pf-v6-u-color-200 pf-v6-u-mt-sm">
-              {values.enrollmentServiceMode === 'connectivity_only'
-                ? t('Cockpit is running flightctl-agent test-connection against the Flight Control server.')
-                : t(
-                    'Cockpit is applying hostname, network, proxy, labels, and NTP settings, then running flightctl-agent enroll on the device.',
-                  )}
-            </p>
           </StackItem>
         </Stack>
       </Bullseye>
@@ -88,9 +76,8 @@ const CockpitOnsiteSetupConfirmationStep = ({
             ? t('Device is connected and reachable.')
             : t('Device is not connected — check network settings on the device.')}
         </p>
-        <p className="pf-v6-u-color-200 pf-v6-u-mt-sm">{getEnrollmentFailureMessage(enrollmentFailureCode, t)}</p>
-        <Button variant="link" onClick={() => goToStepById('review')} className="pf-v6-u-mt-md">
-          {t('Back to review')}
+        <Button variant="link" onClick={() => goToStepById('labels')} className="pf-v6-u-mt-md">
+          {t('Back to device labels')}
         </Button>
       </StackItem>
     </Stack>

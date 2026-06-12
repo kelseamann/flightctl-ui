@@ -10,17 +10,13 @@ import { COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER } from './cockpitOnsiteSetupConstan
 import {
   isConfirmationStepValid,
   isEnrollmentStepValid,
-  isEntryStepValid,
-  isGeneralStepValid,
+  isLabelsStepValid,
   isNetworkStepValid,
-  isReviewStepValid,
 } from './cockpitOnsiteSetupValidation';
 import CockpitOnsiteSetupConfirmationStep from './steps/CockpitOnsiteSetupConfirmationStep';
 import CockpitOnsiteSetupEnrollmentStep from './steps/CockpitOnsiteSetupEnrollmentStep';
-import CockpitOnsiteSetupEntryStep from './steps/CockpitOnsiteSetupEntryStep';
-import CockpitOnsiteSetupGeneralStep from './steps/CockpitOnsiteSetupGeneralStep';
+import CockpitOnsiteSetupLabelsStep from './steps/CockpitOnsiteSetupLabelsStep';
 import CockpitOnsiteSetupNetworkStep from './steps/CockpitOnsiteSetupNetworkStep';
-import CockpitOnsiteSetupReviewStep from './steps/CockpitOnsiteSetupReviewStep';
 import { CockpitOnsiteSetupValues, EnrollmentFailureCode, EnrollmentOutcome } from './types';
 
 const NAV_STEP_ORDER = [...COCKPIT_ONSITE_SETUP_NAV_STEP_ORDER];
@@ -36,7 +32,6 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
   const [enrollmentOutcome, setEnrollmentOutcome] = React.useState<EnrollmentOutcome>('idle');
   const [deviceConnected, setDeviceConnected] = React.useState(false);
   const [enrollmentFailureCode, setEnrollmentFailureCode] = React.useState<EnrollmentFailureCode | undefined>();
-  const [hasStartedEnrollment, setHasStartedEnrollment] = React.useState(false);
 
   const updateValues = (patch: Partial<CockpitOnsiteSetupValues>) => {
     setValues((current) => ({ ...current, ...patch }));
@@ -44,16 +39,12 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
 
   const isStepValid = (stepId: string): boolean => {
     switch (stepId) {
-      case 'entry':
-        return isEntryStepValid(values);
-      case 'general':
-        return isGeneralStepValid(values);
       case 'network':
         return isNetworkStepValid(values);
       case 'enrollment':
         return isEnrollmentStepValid(values);
-      case 'review':
-        return isReviewStepValid(values);
+      case 'labels':
+        return isLabelsStepValid(values);
       case 'confirmation':
         return isConfirmationStepValid(values);
       default:
@@ -67,12 +58,6 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
     }
     const ids: string[] = [];
     for (const id of NAV_STEP_ORDER) {
-      if (id === 'confirmation') {
-        if (hasStartedEnrollment) {
-          ids.push(id);
-        }
-        break;
-      }
       if (isStepValid(id)) {
         ids.push(id);
       } else {
@@ -80,12 +65,13 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
       }
     }
     return ids;
-  }, [values, hasStartedEnrollment]);
+    // isStepValid is derived from values; listing it would recreate each render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values]);
 
   const stepProps = { values, onChange: updateValues };
 
   const handleStartEnrollment = React.useCallback(() => {
-    setHasStartedEnrollment(true);
     setEnrollmentOutcome('running');
     setDeviceConnected(false);
     setEnrollmentFailureCode(undefined);
@@ -118,28 +104,12 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
         />
       }
     >
-      <WizardStep name={t('Onboarding')} id="entry">
-        <CockpitOnsiteSetupEntryStep {...stepProps} />
-      </WizardStep>
-
-      <WizardStep
-        name={t('General information')}
-        id="general"
-        isDisabled={isWizardStepDisabled('general', NAV_STEP_ORDER, validStepIds)}
-      >
-        <CockpitOnsiteSetupGeneralStep {...stepProps} />
-      </WizardStep>
-
-      <WizardStep
-        name={t('Network configurations')}
-        id="network"
-        isDisabled={isWizardStepDisabled('network', NAV_STEP_ORDER, validStepIds)}
-      >
+      <WizardStep name={t('Network')} id="network">
         <CockpitOnsiteSetupNetworkStep {...stepProps} />
       </WizardStep>
 
       <WizardStep
-        name={t('Service enrollment')}
+        name={t('Enrollment')}
         id="enrollment"
         isDisabled={isWizardStepDisabled('enrollment', NAV_STEP_ORDER, validStepIds)}
       >
@@ -147,15 +117,15 @@ const CockpitOnsiteSetupWizard = ({ onCancel, onEnrollmentSuccess }: CockpitOnsi
       </WizardStep>
 
       <WizardStep
-        name={t('Review and enroll')}
-        id="review"
-        isDisabled={isWizardStepDisabled('review', NAV_STEP_ORDER, validStepIds)}
+        name={t('Device labels')}
+        id="labels"
+        isDisabled={isWizardStepDisabled('labels', NAV_STEP_ORDER, validStepIds)}
       >
-        <CockpitOnsiteSetupReviewStep {...stepProps} />
+        <CockpitOnsiteSetupLabelsStep {...stepProps} />
       </WizardStep>
 
       <WizardStep
-        name={t('Confirmation')}
+        name={t('Apply and enroll')}
         id="confirmation"
         isDisabled={isWizardStepDisabled('confirmation', NAV_STEP_ORDER, validStepIds)}
       >

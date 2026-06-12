@@ -108,6 +108,7 @@ const EnrolledDevicesTable = ({
 }: EnrolledDeviceTableProps) => {
   const { t } = useTranslation();
   const { put } = useFetch();
+
   const [addDeviceModal, setAddDeviceModal] = React.useState(false);
   const [isMassDecommissionModalOpen, setIsMassDecommissionModalOpen] = React.useState(false);
   const deviceColumns = React.useMemo(() => getDeviceTableColumns(t), [t]);

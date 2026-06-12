@@ -22,6 +22,7 @@ import { usePermissionsContext } from '../common/PermissionsContext';
 import ResourceListEmptyState from '../common/ResourceListEmptyState';
 import { usePendingEnrollments } from './useEnrollmentRequests';
 import TablePagination from '../Table/TablePagination';
+
 const EnrollmentRequestEmptyState = () => {
   const { t } = useTranslation();
   return <ResourceListEmptyState icon={MicrochipIcon} titleText={t('No enrollment requests here!')} />;

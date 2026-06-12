@@ -1,54 +1,46 @@
-import { CockpitOnsiteSetupValues } from './types';
+import { CockpitOnsiteSetupValues, LabelKeyValue, LabelMapping } from './types';
 
-const isValidVlanId = (value: string): boolean => {
-  if (!value.trim()) {
+const isKeyValueRowComplete = (row: LabelKeyValue): boolean => {
+  const hasKey = row.key.trim().length > 0;
+  const hasValue = row.value.trim().length > 0;
+  if (!hasKey && !hasValue) {
     return true;
   }
-  const id = Number(value);
-  return Number.isInteger(id) && id >= 1 && id <= 4094;
+  return hasKey && hasValue;
 };
 
-export const isEntryStepValid = (_values: CockpitOnsiteSetupValues): boolean => true;
-
-export const isGeneralStepValid = (_values: CockpitOnsiteSetupValues): boolean => true;
-
-export const isNetworkStepValid = (values: CockpitOnsiteSetupValues): boolean => {
-  if (!isValidVlanId(values.vlanId)) {
-    return false;
+const isMappingRowComplete = (row: LabelMapping): boolean => {
+  const hasKey = row.key.trim().length > 0;
+  const hasField = row.systemInfoField.trim().length > 0;
+  if (!hasKey && !hasField) {
+    return true;
   }
-  if (values.networkConnectionType === 'wifi' && !values.wifiSsid.trim()) {
-    return false;
-  }
-  if (values.networkConnectionType === 'wifi' && values.wifiPassword.trim().length > 0) {
-    const len = values.wifiPassword.trim().length;
-    if (len < 8 || len > 63) {
-      return false;
-    }
-  }
-  if (values.ipv4Mode === 'static') {
-    return !!values.ipv4Address.trim() && !!values.dnsServers.trim();
-  }
-  if (values.ipv6Mode === 'static') {
-    return !!values.ipv6Address.trim();
-  }
-  return true;
+  return hasKey && hasField;
 };
+
+export const isNetworkStepValid = (_values: CockpitOnsiteSetupValues): boolean => true;
 
 export const isEnrollmentStepValid = (values: CockpitOnsiteSetupValues): boolean => {
-  if (values.enrollmentServiceMode === 'connectivity_only' || values.enrollmentServiceMode === 'skipped') {
+  if (!values.flightControlEnrollmentEnabled) {
     return true;
   }
-  if (values.enrollmentCredentialMode === 'token') {
+  if (values.authenticationMethod === 'token') {
     return !!values.flightControlToken.trim();
   }
   return !!values.flightControlUsername.trim() && !!values.flightControlPassword.trim();
 };
 
-export const isReviewStepValid = (values: CockpitOnsiteSetupValues): boolean => {
-  if (values.singleNicSetup && !values.singleNicWarningAcknowledged) {
+export const isLabelsStepValid = (values: CockpitOnsiteSetupValues): boolean => {
+  if (!values.hostname.trim()) {
     return false;
   }
-  return isGeneralStepValid(values) && isNetworkStepValid(values) && isEnrollmentStepValid(values);
+  if (!values.customLabels.every(isKeyValueRowComplete)) {
+    return false;
+  }
+  if (!values.labelMappings.every(isMappingRowComplete)) {
+    return false;
+  }
+  return true;
 };
 
 export const isConfirmationStepValid = (_values: CockpitOnsiteSetupValues): boolean => true;

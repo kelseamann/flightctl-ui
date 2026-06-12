@@ -1,27 +1,21 @@
-import { BindingType } from '@flightctl/types/imagebuilder';
-import { CatalogItemArtifactType, CatalogItemType } from '@flightctl/types/alpha';
-
+import {
+  CockpitOnsiteSetupValues,
+  defaultCockpitOnsiteSetupValues,
+} from '../components/CockpitOnsiteSetup/types';
 import { AddCatalogItemFormValues } from '../components/Catalog/AddCatalogItemWizard/types';
 import {
   getInitialValues as getCatalogInitialValues,
   getEmptyArtifact,
   getEmptyVersion,
 } from '../components/Catalog/AddCatalogItemWizard/utils';
-import {
-  CockpitOnsiteSetupValues,
-  defaultCockpitOnsiteSetupValues,
-} from '../components/CockpitOnsiteSetup/types';
 import { ImageBuildFormValues } from '../components/ImageBuilds/CreateImageBuildWizard/types';
 import { getInitialValues as getImageBuildInitialValues } from '../components/ImageBuilds/CreateImageBuildWizard/utils';
+import { BindingType } from '@flightctl/types/imagebuilder';
+import { CatalogItemArtifactType, CatalogItemType } from '@flightctl/types/alpha';
 
 export const getDevMockCockpitOnsiteSetupInitialValues = (): CockpitOnsiteSetupValues => ({
   ...defaultCockpitOnsiteSetupValues,
-  hostname: 'warehouse-edge-07',
-  labels: 'site=plant-a\nrole=edge',
-  networkConnectionType: 'ethernet',
-  ipv4Mode: 'static',
-  ipv4Address: '192.168.1.50/24',
-  flightControlEndpoint: 'https://flightctl.example.com',
+  serviceEndpoint: 'example-endpoint-123',
   flightControlToken: 'mock-enrollment-token',
 });
 

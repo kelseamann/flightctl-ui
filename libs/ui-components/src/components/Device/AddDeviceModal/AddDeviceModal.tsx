@@ -1,6 +1,8 @@
 import * as React from 'react';
 import {
   Button,
+  Content,
+  ContentVariants,
   List,
   ListComponent,
   ListItem,
@@ -21,11 +23,6 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import LearnMoreLink from '../../common/LearnMoreLink';
 import { FlightCtlApp, useAppContext } from '../../../hooks/useAppContext';
 import { useAppLinks } from '../../../hooks/useAppLinks';
-import {
-  MOCK_DEVICE_COCKPIT_URL,
-  MOCK_SETUP_ETHERNET_CIDR,
-  MOCK_SETUP_WIFI_SSID,
-} from '../../CockpitOnsiteSetup/cockpitOnsiteSetupConstants';
 import { UX_BRANCH_EDM_3710, UX_BRANCH_PARAM, useUxBranch } from '../../../hooks/useUxBranch';
 
 const getOnsiteSetupUrl = (): string => {
@@ -35,47 +32,51 @@ const getOnsiteSetupUrl = (): string => {
 
 const OnsiteOnboardingTabContent = () => {
   const { t } = useTranslation();
+  const tokenDocLink = useAppLinks('addNewDevice');
 
   return (
     <Stack hasGutter>
       <StackItem>
-        {t(
-          'For devices on unmanaged networks without DHCP, complete first-boot onboarding on the device through Cockpit before the device can submit an enrollment request to Flight Control.',
-        )}
+        <Stack hasGutter>
+          <StackItem>
+            <Content component={ContentVariants.h4}>{t('Before')}</Content>
+          </StackItem>
+          <StackItem>
+            <Content component={ContentVariants.p}>
+              {t(
+                "If you need to provide the enrollment credentials for the device, you'll need an authentication token or your username and password.",
+              )}
+            </Content>
+          </StackItem>
+          <StackItem>
+            <LearnMoreLink link={tokenDocLink} text={t('Where can I get my token?')} />
+          </StackItem>
+        </Stack>
       </StackItem>
       <StackItem>
-        <strong>{t('Before you go onsite')}</strong>
-        <List component={ListComponent.ul} className="pf-v6-u-mt-sm">
-          <ListItem>
-            {t(
-              'Sign in to Flight Control and copy the auth token for this device enrollment. You will paste it into the Cockpit wizard on the device — credentials are never generated onsite.',
-            )}
-          </ListItem>
-          <ListItem>
-            {t(
-              'Connect your laptop or phone to the device setup network (Wi-Fi access point or wired setup interface) before opening Cockpit.',
-            )}
-          </ListItem>
-        </List>
-      </StackItem>
-      <StackItem>
-        <strong>{t('Setup network access on the device')}</strong>
-        <List component={ListComponent.ul} className="pf-v6-u-mt-sm">
-          <ListItem>
-            {t('Wi-Fi access point:')}{' '}
-            <span className="pf-v6-u-font-family-monospace">{MOCK_SETUP_WIFI_SSID}</span>
-            {' — '}
-            {t('captive portal shows device serial and MAC, then redirects to Cockpit.')}
-          </ListItem>
-          <ListItem>
-            {t('Wired setup interface:')}{' '}
-            <span className="pf-v6-u-font-family-monospace">{MOCK_SETUP_ETHERNET_CIDR}</span>
-          </ListItem>
-          <ListItem>
-            {t('Cockpit URL (HTTP during setup):')}{' '}
-            <span className="pf-v6-u-font-family-monospace">{MOCK_DEVICE_COCKPIT_URL}</span>
-          </ListItem>
-        </List>
+        <Stack hasGutter>
+          <StackItem>
+            <Content component={ContentVariants.h4}>{t('Onsite')}</Content>
+          </StackItem>
+          <StackItem>
+            <List component={ListComponent.ul}>
+              <ListItem>{t('Log in to the device (you must know the device address).')}</ListItem>
+              <ListItem>
+                {t('Ensure Cockpit is enabled:')}{' '}
+                <span className="pf-v6-u-font-family-monospace">sudo systemctl status cockpit.socket</span>
+              </ListItem>
+              <ListItem>
+                {t('If Cockpit is not enabled, enable it:')}{' '}
+                <span className="pf-v6-u-font-family-monospace">sudo systemctl enable --now cockpit.socket</span>
+              </ListItem>
+              <ListItem>
+                {t('Navigate to Cockpit:')}{' '}
+                <span className="pf-v6-u-font-family-monospace">&lt;device-address&gt;:9090</span>
+              </ListItem>
+              <ListItem>{t('Click the Onboarding tab on the left and complete the wizard.')}</ListItem>
+            </List>
+          </StackItem>
+        </Stack>
       </StackItem>
     </Stack>
   );
@@ -170,14 +171,14 @@ const AddDeviceModal = ({ onClose }: { onClose: VoidFunction }) => {
         )}
       </ModalBody>
       <ModalFooter>
-        <Button variant="link" onClick={onClose}>
-          {t('Close')}
-        </Button>
         {showOnsitePrimaryAction && (
           <Button variant="primary" icon={<ExternalLinkAltIcon />} iconPosition="end" onClick={openOnsiteSetup}>
             {t('Open device onboarding')}
           </Button>
         )}
+        <Button variant="link" onClick={onClose}>
+          {t('Close')}
+        </Button>
       </ModalFooter>
     </Modal>
   );

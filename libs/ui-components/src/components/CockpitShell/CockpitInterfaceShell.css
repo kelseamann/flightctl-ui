@@ -1,0 +1,240 @@
+.fctl-cockpit-interface-shell {
+  --fctl-cockpit-shell-bg: #f0f0f0;
+  --fctl-cockpit-shell-surface: #ffffff;
+  --fctl-cockpit-shell-border: #d2d2d2;
+  --fctl-cockpit-shell-text: #151515;
+  --fctl-cockpit-shell-text-muted: #6a6e73;
+  --fctl-cockpit-shell-accent: #0066cc;
+  --fctl-cockpit-shell-nav-active: #ededed;
+  --fctl-cockpit-shell-topbar-height: 48px;
+  --fctl-cockpit-shell-sidebar-width: 220px;
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fctl-cockpit-shell-bg);
+  color: var(--fctl-cockpit-shell-text);
+}
+
+.fctl-cockpit-interface-shell__topbar {
+  align-items: center;
+  background: var(--fctl-cockpit-shell-surface);
+  border-bottom: 1px solid var(--fctl-cockpit-shell-border);
+  display: flex;
+  flex: 0 0 var(--fctl-cockpit-shell-topbar-height);
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.fctl-cockpit-interface-shell__session-user {
+  color: var(--fctl-cockpit-shell-text-muted);
+  font-size: 14px;
+}
+
+.fctl-cockpit-interface-shell__topbar-actions {
+  align-items: center;
+  display: flex;
+  gap: 20px;
+}
+
+.fctl-cockpit-interface-shell__topbar-action {
+  align-items: center;
+  color: var(--fctl-cockpit-shell-text-muted);
+  display: inline-flex;
+  font-size: 14px;
+  gap: 6px;
+}
+
+.fctl-cockpit-interface-shell__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.fctl-cockpit-interface-shell__sidebar {
+  background: var(--fctl-cockpit-shell-surface);
+  border-right: 1px solid var(--fctl-cockpit-shell-border);
+  flex: 0 0 var(--fctl-cockpit-shell-sidebar-width);
+  padding: 16px 12px;
+}
+
+.fctl-cockpit-interface-shell__search {
+  margin-bottom: 16px;
+}
+
+.fctl-cockpit-interface-shell__search .pf-v6-c-text-input-group,
+.fctl-cockpit-interface-shell__search .pf-v6-c-text-input-group__text-input {
+  background: var(--fctl-cockpit-shell-bg);
+  border-color: var(--fctl-cockpit-shell-border);
+  color: var(--fctl-cockpit-shell-text);
+}
+
+.fctl-cockpit-interface-shell__sidebar-heading {
+  color: var(--fctl-cockpit-shell-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.fctl-cockpit-interface-shell__nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fctl-cockpit-interface-shell__nav-item {
+  border-radius: 4px;
+  color: var(--fctl-cockpit-shell-text);
+  display: block;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 8px 12px;
+}
+
+.fctl-cockpit-interface-shell__nav-item--active {
+  background: var(--fctl-cockpit-shell-nav-active);
+}
+
+.fctl-cockpit-interface-shell__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* PatternFly wizard inside Cockpit shell */
+.fctl-cockpit-interface-shell .pf-v6-c-wizard {
+  --pf-v6-c-wizard--BackgroundColor: transparent;
+  background: transparent;
+  color: var(--fctl-cockpit-shell-text);
+  flex: 1;
+  min-height: 0;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__header {
+  display: none;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__outer-wrap,
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__inner-wrap,
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__main {
+  background: transparent;
+  min-height: 0;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__main {
+  align-items: stretch;
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav {
+  background: var(--fctl-cockpit-shell-surface);
+  border-right: 1px solid var(--fctl-cockpit-shell-border);
+  flex: 0 0 240px;
+  padding: 24px 16px;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-list {
+  counter-reset: fctl-cockpit-wizard-step;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-list-item {
+  margin: 0;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-link {
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: var(--fctl-cockpit-shell-text-muted);
+  counter-increment: fctl-cockpit-wizard-step;
+  display: block;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0 0 4px;
+  padding: 8px 12px;
+  text-align: left;
+  width: 100%;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-link::before {
+  content: counter(fctl-cockpit-wizard-step) '. ';
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-link.pf-m-current {
+  background: var(--fctl-cockpit-shell-nav-active);
+  color: var(--fctl-cockpit-shell-text);
+  font-weight: 600;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-link:disabled,
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__nav-link.pf-m-disabled {
+  color: #8b8d8f;
+  opacity: 1;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__main-body {
+  background: var(--fctl-cockpit-shell-surface);
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 24px;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__footer,
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__footer-wrapper {
+  border-top: 1px solid var(--fctl-cockpit-shell-border);
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__footer .pf-v6-c-button.pf-m-secondary {
+  --pf-v6-c-button--m-secondary--BackgroundColor: transparent;
+  --pf-v6-c-button--m-secondary--Color: var(--fctl-cockpit-shell-text);
+  --pf-v6-c-button--m-secondary--BorderColor: var(--fctl-cockpit-shell-border);
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-wizard__footer .pf-v6-c-button.pf-m-link {
+  --pf-v6-c-button--m-link--Color: var(--fctl-cockpit-shell-accent);
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-title,
+.fctl-cockpit-interface-shell .pf-v6-c-content,
+.fctl-cockpit-interface-shell .pf-v6-c-form__label-text,
+.fctl-cockpit-interface-shell .pf-v6-c-radio__label,
+.fctl-cockpit-interface-shell .pf-v6-c-check__label,
+.fctl-cockpit-interface-shell .pf-v6-c-table,
+.fctl-cockpit-interface-shell .pf-v6-c-table td,
+.fctl-cockpit-interface-shell .pf-v6-c-table th {
+  color: var(--fctl-cockpit-shell-text);
+}
+
+.fctl-cockpit-interface-shell .pf-v6-u-color-200,
+.fctl-cockpit-interface-shell .pf-v6-c-content.pf-v6-u-color-200,
+.fctl-cockpit-interface-shell p.pf-v6-u-color-200 {
+  color: var(--fctl-cockpit-shell-text-muted) !important;
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-text-input-group,
+.fctl-cockpit-interface-shell .pf-v6-c-text-input-group__text-input,
+.fctl-cockpit-interface-shell .pf-v6-c-form-control,
+.fctl-cockpit-interface-shell .pf-v6-c-form-select {
+  background: var(--fctl-cockpit-shell-surface);
+  border-color: var(--fctl-cockpit-shell-border);
+  color: var(--fctl-cockpit-shell-text);
+}
+
+.fctl-cockpit-interface-shell .pf-v6-c-alert {
+  --pf-v6-c-alert--BackgroundColor: #fdf7e7;
+  --pf-v6-c-alert--BorderColor: #f0ab00;
+  --pf-v6-c-alert__title--Color: var(--fctl-cockpit-shell-text);
+}

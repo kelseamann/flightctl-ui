@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Content, Flex, FlexItem, Icon, Stack, StackItem, Title } from '@patternfly/react-core';
+import { Alert, AlertActionLink, Button, Stack, StackItem, Title } from '@patternfly/react-core';
 import { ExpandableRowContent, OnSelect, Tbody, Td, Tr } from '@patternfly/react-table';
 import { ExclamationCircleIcon } from '@patternfly/react-icons/dist/js/icons/exclamation-circle-icon';
 
@@ -54,14 +54,14 @@ const ImageBuildRow = ({
 
   const imageBuildName = imageBuild.metadata.name || '';
   const buildReason = getImageBuildStatusReason(imageBuild);
-  const { buildStatus, pipelineStatus, catalogSync, pipelineSteps } = mapImageBuildToColumnBugState(
-    imageBuild,
-    latestPromotion,
-    canAddToCatalog,
-  );
+  const { buildStatus, pipelineStatus, catalogSync, exportStepDisplay, showCatalogStep } =
+    mapImageBuildToColumnBugState(imageBuild, latestPromotion, canAddToCatalog);
 
   const sourceImage = getImageBuildImage(imageBuild.spec.source);
   const destinationImage = getImageBuildImage(imageBuild.spec.destination);
+  const handleSeeDetails = React.useCallback(() => {
+    setIsExpanded((expanded) => !expanded);
+  }, []);
 
   return (
     <Tbody isExpanded={isExpanded}>
@@ -91,7 +91,8 @@ const ImageBuildRow = ({
             buildStatus={buildStatus}
             pipelineStatus={pipelineStatus}
             catalogSync={catalogSync}
-            pipelineSteps={pipelineSteps}
+            exportStepDisplay={exportStepDisplay}
+            showCatalogStep={showCatalogStep}
             variant="status"
           />
         </Td>
@@ -101,8 +102,10 @@ const ImageBuildRow = ({
             buildStatus={buildStatus}
             pipelineStatus={pipelineStatus}
             catalogSync={catalogSync}
-            pipelineSteps={pipelineSteps}
+            exportStepDisplay={exportStepDisplay}
+            showCatalogStep={showCatalogStep}
             variant="actions"
+            onSeeDetails={handleSeeDetails}
             onRetry={canNewVersion ? onNewVersionClick : undefined}
             onPushToCatalog={canAddToCatalog ? onAddToCatalog : undefined}
             onOpenCatalog={() => navigate(ROUTE.CATALOG)}
@@ -132,34 +135,23 @@ const ImageBuildRow = ({
                     </Title>
                   </StackItem>
                   {buildReason === ImageBuildConditionReason.ImageBuildConditionReasonFailed && (
-                    <Flex alignItems={{ default: 'alignItemsCenter' }}>
-                      <FlexItem>
-                        <Icon status="danger">
-                          <ExclamationCircleIcon />
-                        </Icon>
-                      </FlexItem>
-                      {canNewVersion ? (
-                        <>
-                          <FlexItem>
-                            <Content>{t('Build failed. Please rebuild.')}</Content>
-                          </FlexItem>
-                          <FlexItem>
-                            <Button
-                              variant="link"
-                              onClick={() =>
-                                navigate({ route: ROUTE.IMAGE_BUILD_NEW_VERSION, postfix: imageBuildName })
-                              }
-                            >
-                              {t('Rebuild')}
-                            </Button>
-                          </FlexItem>
-                        </>
-                      ) : (
-                        <FlexItem>
-                          <Content>{t('Build failed.')}</Content>
-                        </FlexItem>
-                      )}
-                    </Flex>
+                    <StackItem>
+                      <Alert
+                        isInline
+                        variant="danger"
+                        title={t('Build failed')}
+                        customIcon={<ExclamationCircleIcon />}
+                        actionLinks={
+                          canNewVersion ? (
+                            <AlertActionLink onClick={onNewVersionClick}>{t('Retry build')}</AlertActionLink>
+                          ) : undefined
+                        }
+                      >
+                        {t(
+                          'This is a long error message placeholder for the image build failure state. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. The message continues so reviewers can validate truncation, scrolling, and layout when real backend errors are verbose.',
+                        )}
+                      </Alert>
+                    </StackItem>
                   )}
                   <StackItem>
                     <Button

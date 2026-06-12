@@ -8,6 +8,7 @@ import { ListAction } from '../ListPage/types';
 import { useTranslation } from '../../hooks/useTranslation';
 import { ROUTE } from '../../hooks/useNavigate';
 import ResourceLink from '../common/ResourceLink';
+
 type EnrollmentRequestTableRow = {
   rowIndex: number;
   onRowSelect: (er: EnrollmentRequest) => OnSelect;
